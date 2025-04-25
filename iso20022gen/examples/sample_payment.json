@@ -1,0 +1,43 @@
+{
+  "fedWireMessage": {
+    "inputMessageAccountabilityData": {
+      "inputCycleDate": "20250109",
+      "inputSource": "MBANQ",
+      "inputSequenceNumber": "001000001"
+    },
+    "amount": {
+      "amount": "1000"
+    },
+    "senderDepositoryInstitution": {
+      "senderABANumber": "121182904",
+      "senderShortName": "NORTH BAY CREDIT U"
+    },
+    "receiverDepositoryInstitution": {
+      "receiverABANumber": "084106768",
+      "receiverShortName": "EVOLVE BANK & TRUST"
+    },
+    "originator": {
+      "personal": {
+        "name": "JANE SMITH",
+        "address": {
+          "addressLineOne": "456 OAK AVENUE",
+          "addressLineTwo": "SOMEWHERE, CA 67890",
+          "addressLineThree": ""
+        },
+        "identifier": "550103129900943"
+      }
+    },
+    "beneficiary": {
+      "personal": {
+        "name": "JOHN DOE",
+        "address": {
+          "addressLineOne": "123 MAIN STREET",
+          "addressLineTwo": "ANYTOWN, TX 12345",
+          "addressLineThree": ""
+        },
+        "identifier": "9512227031535633"
+      }
+    }
+  },
+  "receiverRoutingNumber": "021151080"
+} 

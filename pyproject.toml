@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iso20022gen"
+version = "0.1.0"
+description = "ISO 20022 Message Generator for Financial Messaging"
+readme = "README.md"
+authors = [
+    {name = "Mbanq", email = "info@mbanq.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["iso20022", "financial", "messaging", "banking", "fedwire"]
+dependencies = [
+    "xmlschema>=1.9.0",
+    "python-dotenv>=0.19.0",
+]
+requires-python = ">=3.7"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.12",
+    "black>=21.5b2",
+    "isort>=5.9.1",
+    "flake8>=3.9.2",
+    "mypy>=0.812",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/mbanq/iso20022gen"
+"Bug Tracker" = "https://github.com/mbanq/iso20022gen/issues"
+
+[project.scripts]
+iso20022gen = "iso20022gen.cli:main"
+
+[tool.setuptools]
+packages = ["iso20022gen"]
+
+[tool.black]
+line-length = 100
+target-version = ["py37", "py38", "py39", "py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+python_classes = "Test*" 
