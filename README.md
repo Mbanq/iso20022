@@ -18,39 +18,84 @@ For information on the proprietary Fedwire envelope format and specifications, p
 
 ## Installation
 
+### From Source
+
+1. Clone the repository:
 ```bash
-pip install iso20022gen
+git clone https://github.com/mbanq/iso20022gen.git
+cd iso20022gen
+```
+
+2. Create and activate a virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+```
+
+3. Install the package in development mode:
+```bash
+pip install -e .
 ```
 
 ## Quick Start
 
 ### Generating an ISO 20022 Message
 
-```python
-from iso20022gen import Iso20022CodeGen
-import json
-
-# Load your payment data
-with open("payment_data.json", "r") as f:
-    payment_data = json.load(f)
-
-# Initialize the generator
-generator = Iso20022CodeGen()
-
-# Generate the ISO 20022 message
-result = generator.process(payment_data)
-
-if result["statusCode"] == 200:
-    # Access the generated ISO 20022 XML
-    iso_message = result["body"]
-    print(iso_message)
-```
-
-### Command Line Usage
+The simplest way to test the message generation is using the standalone test script with a sample payload:
 
 ```bash
-# Generate ISO 20022 message from payment data
-iso20022gen generate payment_data.json
+python standalone_test.py iso20022gen/examples/sample_payload.json
+```
+
+This will generate:
+1. An ISO 20022 AppHdr (header) XML
+2. A pacs.008.001.08 (credit transfer) Document XML
+3. A combined output file named `output.xml`
+
+### Sample Payload Format
+
+The input JSON payload should follow this structure:
+```json
+{
+    "fedWireMessage": {
+        "inputMessageAccountabilityData": {
+            "inputCycleDate": "20250109",
+            "inputSource": "MBANQ",
+            "inputSequenceNumber": "001000001"
+        },
+        "amount": {
+            "amount": "1000"  // Amount in cents
+        },
+        "senderDepositoryInstitution": {
+            "senderABANumber": "121182904",
+            "senderShortName": "NORTH BAY CREDIT U"
+        },
+        "receiverDepositoryInstitution": {
+            "receiverABANumber": "084106768",
+            "receiverShortName": "EVOLVE BANK & TRUST"
+        },
+        "beneficiary": {
+            "personal": {
+                "name": "JOHN DOE",
+                "identifier": "9512227031535633",
+                "address": {
+                    "addressLineOne": "123 MAIN STREET",
+                    "addressLineTwo": "ANYTOWN, TX 12345"
+                }
+            }
+        },
+        "originator": {
+            "personal": {
+                "name": "JANE SMITH",
+                "identifier": "550103129900943",
+                "address": {
+                    "addressLineOne": "456 OAK AVENUE",
+                    "addressLineTwo": "SOMEWHERE, CA 67890"
+                }
+            }
+        }
+    }
+}
 ```
 
 ## Project Structure
@@ -68,88 +113,6 @@ For official information about Fedwire ISO 20022 implementation, including envel
 - Federal Reserve's MyStandards platform (requires registration)
 - The Fedwire Funds Service ISO 20022 Implementation Guide and Technical Guide
 
-## Documentation
-
-For detailed documentation, please visit our [documentation site](https://iso20022gen.readthedocs.io/).
-
-## Input Format
-
-The library expects payment data in a specific JSON format. Here's an example:
-
-```json
-{
-  "fedWireMessage": {
-    "inputMessageAccountabilityData": {
-      "inputCycleDate": "20250109",
-      "inputSource": "MBANQ001",
-      "inputSequenceNumber": "000001"
-    },
-    "amount": {
-      "amount": "000000001000"
-    },
-    "senderDepositoryInstitution": {
-      "senderABANumber": "121182904",
-      "senderShortName": "EXAMPLE BANK NAME"
-    },
-    "receiverDepositoryInstitution": {
-      "receiverABANumber": "084106768",
-      "receiverShortName": "RECEIVING BANK"
-    },
-    "beneficiary": {
-      "personal": {
-        "identificationCode": "D",
-        "identifier": "9512227031535633",
-        "name": "JOHN DOE",
-        "address": {
-          "addressLineOne": "123 MAIN STREET",
-          "addressLineTwo": "ANYTOWN TX 12345"
-        }
-      }
-    },
-    "originator": {
-      "personal": {
-        "identificationCode": "D",
-        "identifier": "550103129900943",
-        "name": "JANE SMITH",
-        "address": {
-          "addressLineOne": "456 OAK AVENUE",
-          "addressLineTwo": "SOMEWHERE CA 67890",
-          "addressLineThree": ""
-        }
-      }
-    }
-  }
-}
-```
-
-## Output
-
-The library generates ISO 20022 compliant XML consisting of:
-1. AppHdr - The ISO 20022 business application header
-2. Document - The ISO 20022 pacs.008 document
-
-**NOTE:** These XML components must be wrapped in the proprietary Fedwire envelope according to Federal Reserve specifications before being sent to the Fedwire Funds Service. The envelope generation is not part of this open-source project.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Install development dependencies (`pip install -e ".[dev]"`)
-4. Commit your changes (`git commit -m 'Add some amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-Please make sure your code adheres to our coding standards by running:
-
-```bash
-black iso20022gen tests
-isort iso20022gen tests
-flake8 iso20022gen tests
-mypy iso20022gen tests
-pytest
-```
 
 ## License
 

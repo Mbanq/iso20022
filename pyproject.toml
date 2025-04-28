@@ -8,7 +8,8 @@ version = "0.1.0"
 description = "ISO 20022 Message Generator for Financial Messaging"
 readme = "README.md"
 authors = [
-    {name = "Mbanq", email = "info@mbanq.com"}
+    {name = "Vamsi Krishna", email = "vamsi.krishna@mbanq.com"},
+    {name = "Sai Vatsavai", email = "sai.vatsavai@mbanq.com"}
 ]
 license = {text = "MIT"}
 classifiers = [
@@ -27,18 +28,11 @@ keywords = ["iso20022", "financial", "messaging", "banking", "fedwire"]
 dependencies = [
     "xmlschema>=1.9.0",
     "python-dotenv>=0.19.0",
+    "xmltodict>=0.13.0",
+    "setuptools~=58.0.4"
 ]
 requires-python = ">=3.7"
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=6.0",
-    "pytest-cov>=2.12",
-    "black>=21.5b2",
-    "isort>=5.9.1",
-    "flake8>=3.9.2",
-    "mypy>=0.812",
-]
 
 [project.urls]
 "Homepage" = "https://github.com/mbanq/iso20022gen"
@@ -64,9 +58,3 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = "test_*.py"
-python_functions = "test_*"
-python_classes = "Test*" 

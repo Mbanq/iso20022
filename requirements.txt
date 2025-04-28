@@ -1,7 +1,0 @@
-iso20022gen~=0.1.0
-python-dotenv~=1.1.0
-xmlschema~=4.0.1
-pytest~=8.3.5
-setuptools~=58.0.4
-xmltodict~=0.14.2
-pydantic~=2.11.3
