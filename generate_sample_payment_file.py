@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+    #!/usr/bin/env python3
 """
 Test the ISO 20022 message generation using the available models.
 """
@@ -10,7 +10,7 @@ from iso20022gen.models.xml_converter import dict_to_xml
 
 def main():
     # Load payload
-    with open("iso20022gen/examples/sample_payment.json", "r") as f:
+    with open("iso20022gen/sample_files/sample_payment.json", "r") as f:
         payload = json.load(f)
 
     # Create model objects and convert to dict representation

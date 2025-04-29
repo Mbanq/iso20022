@@ -4,8 +4,6 @@ from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from typing import Dict, Any
 
-from iso20022gen import config
-
 
 @dataclass
 class ClrSysMmbId:
@@ -72,7 +70,7 @@ class AppHdr:
         )
 
         sender_aba = fedwire_message["senderDepositoryInstitution"]["senderABANumber"]
-        routing = config.ROUTING_NUMBER
+        receiver_aba = fedwire_message["receiverDepositoryInstitution"]["receiverABANumber"]
 
         return cls(
             Fr=Fr(
@@ -85,13 +83,16 @@ class AppHdr:
             To=To(
                 FIId=FIId(
                     FinInstnId=FinInstnId(
-                        ClrSysMmbId=ClrSysMmbId(MmbId=routing)
+                        ClrSysMmbId=ClrSysMmbId(MmbId=receiver_aba)
                     )
                 )
             ),
             BizMsgIdr=message_id,
             MsgDefIdr="pacs.008.001.08",
-            BizSvc=config.BUSINESS_SERVICE,
-            MktPrctc=MktPrctc(config.MARKET_PRACTICE_REGY, config.MARKET_PRACTICE_ID),
+            BizSvc="TEST",
+            MktPrctc=MktPrctc(
+                Regy="www2.swift.com/mystandards/#/group/Federal_Reserve_Financial_Services/Fedwire_Funds_Service",
+                Id="frb.fedwire.01"
+            ),
             CreDt=datetime.now(timezone.utc).isoformat(),
         )
