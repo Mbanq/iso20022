@@ -119,4 +119,4 @@ For official information about Fedwire ISO 20022 implementation, including envel
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-<p align="center">  ## Built with <3 in the Beautiful State of Washington</p>
+<p align="center"><strong style="font-size: 2em">Built with :heart: in the Beautiful State of Washington</strong></p>
