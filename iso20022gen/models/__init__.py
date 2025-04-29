@@ -2,13 +2,32 @@
 ISO 20022 data models package.
 """
 
-# Import the dictionary-based implementations instead of Pydantic models
+from dataclasses import asdict
+from iso20022gen.models.head import AppHdr
+from iso20022gen.models.pacs import Document, FIToFICstmrCdtTrf
 from iso20022gen.models.xml_converter import dict_to_xml
 
 
-def model_to_xml(model, prefix, namespace):
+def model_to_xml(model, prefix=None, namespace=None):
     """Convert model to XML using the dictionary-based approach."""
     if hasattr(model, 'to_dict'):
         xml_dict = model.to_dict()
-        return dict_to_xml(xml_dict, prefix, namespace)
-    return dict_to_xml(model)
+    else:
+        xml_dict = asdict(model)
+        if prefix and namespace:
+            xml_dict = {
+                "Document": {
+                    f"@xmlns:{prefix}": namespace,
+                    **xml_dict
+                }
+            }
+    return dict_to_xml(xml_dict, prefix=prefix, namespace=namespace)
+
+
+__all__ = [
+    "AppHdr",
+    "Document",
+    "FIToFICstmrCdtTrf",
+    "dict_to_xml",
+    "model_to_xml",
+]
