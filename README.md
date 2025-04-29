@@ -25,7 +25,7 @@ pip install -e .
 
 ### Dictionary-based Approach
 
-Here's an example of generating an ISO20022 message using the dictionary-based approach:
+Here's an example of generating an ISO20022 message:
 
 ```python
 import json
@@ -84,13 +84,13 @@ Your input JSON should follow this structure:
     "amount": {
       "amount": "1000",
       "currency": "USD"
-    },
+    }
     // ... other payment details
   }
 }
 ```
 
-## Features
+## Key Features
 
 - **Clean XML Output**: The library automatically removes empty optional fields from the XML output, ensuring clean and valid ISO20022 messages.
 - **Namespace Handling**: Proper namespace prefixing and declarations are automatically managed.
@@ -104,6 +104,15 @@ To run the tests:
 ```bash
 python test_dict_approach.py
 ```
+
+## Important Notice on Proprietary Envelope
+
+The Fedwire envelope format is proprietary and must be implemented according to the Federal Reserve specifications. This library only generates the ISO 20022 message content (AppHdr and Document) that goes inside the envelope.
+
+For official information about Fedwire ISO 20022 implementation, including envelope specifications, please consult:
+- [Federal Reserve ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center)
+- Federal Reserve's MyStandards platform (requires registration)
+- The Fedwire Funds Service ISO 20022 Implementation Guide
 
 ## Contributing
 
