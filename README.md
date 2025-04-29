@@ -1,124 +1,118 @@
-# ISO20022Gen
+# ISO20022 Message Generator
 
-A Python library for generating ISO 20022 compliant financial messages, with a focus on FedWire Funds Service compatibility.
-
-## About This Project
-
-This open-source library focuses **exclusively** on generating the ISO 20022 XML content for financial messages. The library **does not generate the proprietary Fedwire envelope** which must be implemented separately according to Federal Reserve specifications.
-
-For information on the proprietary Fedwire envelope format and specifications, please refer to the [Federal Reserve's ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center).
+A Python library for generating ISO20022 compliant financial messages, with a focus on FedWire Funds Service compatibility.
 
 ## Features
 
-- Generate ISO 20022 compliant XML messages for financial transactions
-- Support for pacs.008.001.08 message generation
-- Validated against official ISO 20022 schemas
-- Simple API for integrating with existing financial systems
-- Command-line interface for direct usage
+- Generate ISO20022 compliant XML messages
+- Support for pacs.008 (FIToFICstmrCdtTrf) message type
+- Automatic handling of namespaces and XML structure
+- Clean XML output with no empty optional fields
+- Support for both AppHdr and Document components
 
 ## Installation
 
-### From Source
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/mbanq/iso20022gen.git
-cd iso20022gen
-```
+# Clone the repository
+git clone https://github.com/yourusername/iso20022.git
+cd iso20022
 
-2. Create and activate a virtual environment:
-```bash
-python3 -m venv venv
-source venv/bin/activate  # On Windows, use: venv\Scripts\activate
-```
-
-3. Install the package in development mode:
-```bash
+# Install in development mode
 pip install -e .
 ```
 
-## Quick Start
+## Usage
 
-### Generating an ISO 20022 Message
+### Dictionary-based Approach
 
-The simplest way to test the message generation is using the standalone test script with a sample payload:
+Here's an example of generating an ISO20022 message using the dictionary-based approach:
 
-```bash
-python standalone_test.py iso20022gen/examples/sample_payload.json
+```python
+import json
+from dataclasses import asdict
+from iso20022gen.models.apphdr import AppHdr
+from iso20022gen.models.pacs008 import Document
+from iso20022gen.models.xml_converter import dict_to_xml
+
+# Load your payment data
+with open("iso20022gen/examples/sample_payment.json", "r") as f:
+    payload = json.load(f)
+
+# Create AppHdr and Document objects
+app_hdr = AppHdr.from_payload(payload)
+document = Document.from_payload(payload)
+
+# Convert to dictionaries
+app_hdr_dict = asdict(app_hdr)
+document_dict = asdict(document)
+
+# Generate XML with proper namespaces
+app_hdr_xml = dict_to_xml(
+    app_hdr_dict,
+    prefix="head",
+    namespace="urn:iso:std:iso:20022:tech:xsd:head.001.001.03",
+    root="AppHdr"
+)
+document_xml = dict_to_xml(
+    document_dict,
+    prefix="pacs",
+    namespace="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08",
+    root="Document"
+)
+
+# Combine XMLs with XML declaration
+xml_decl = '<?xml version="1.0" encoding="utf-8"?>'
+combined_xml = f"{xml_decl}\n{app_hdr_xml}\n{document_xml}"
+
+# Save to file
+with open("output.xml", "w") as f:
+    f.write(combined_xml)
 ```
-
-This will generate:
-1. An ISO 20022 AppHdr (header) XML
-2. A pacs.008.001.08 (credit transfer) Document XML
-3. A combined output file named `output.xml`
 
 ### Sample Payload Format
 
-The input JSON payload should follow this structure:
+Your input JSON should follow this structure:
+
 ```json
 {
-    "fedWireMessage": {
-        "inputMessageAccountabilityData": {
-            "inputCycleDate": "20250109",
-            "inputSource": "MBANQ",
-            "inputSequenceNumber": "001000001"
-        },
-        "amount": {
-            "amount": "1000"  // Amount in cents
-        },
-        "senderDepositoryInstitution": {
-            "senderABANumber": "121182904",
-            "senderShortName": "NORTH BAY CREDIT U"
-        },
-        "receiverDepositoryInstitution": {
-            "receiverABANumber": "084106768",
-            "receiverShortName": "EVOLVE BANK & TRUST"
-        },
-        "beneficiary": {
-            "personal": {
-                "name": "JOHN DOE",
-                "identifier": "9512227031535633",
-                "address": {
-                    "addressLineOne": "123 MAIN STREET",
-                    "addressLineTwo": "ANYTOWN, TX 12345"
-                }
-            }
-        },
-        "originator": {
-            "personal": {
-                "name": "JANE SMITH",
-                "identifier": "550103129900943",
-                "address": {
-                    "addressLineOne": "456 OAK AVENUE",
-                    "addressLineTwo": "SOMEWHERE, CA 67890"
-                }
-            }
-        }
-    }
+  "fedWireMessage": {
+    "inputMessageAccountabilityData": {
+      "inputCycleDate": "20250109",
+      "inputSource": "MBANQ",
+      "inputSequenceNumber": "001000001"
+    },
+    "amount": {
+      "amount": "1000",
+      "currency": "USD"
+    },
+    // ... other payment details
+  }
 }
 ```
 
-## Project Structure
+## Features
 
-- `code_generator.py`: The core ISO 20022 message generation functionality
-- `config.py`: Configuration handling for the library
+- **Clean XML Output**: The library automatically removes empty optional fields from the XML output, ensuring clean and valid ISO20022 messages.
+- **Namespace Handling**: Proper namespace prefixing and declarations are automatically managed.
+- **Type Safety**: Uses Python dataclasses for type safety and validation.
+- **Extensible**: Easy to add support for additional ISO20022 message types.
 
-## Important Notice on Proprietary Envelope
+## Development
 
-The Fedwire envelope format is proprietary and must be implemented according to the Federal Reserve specifications. This library only generates the ISO 20022 message content (AppHdr and Document) that goes inside the envelope.
+To run the tests:
 
-For official information about Fedwire ISO 20022 implementation, including envelope specifications, please consult the following resources:
+```bash
+python test_dict_approach.py
+```
 
-- [Federal Reserve ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center)
-- Federal Reserve's MyStandards platform (requires registration)
-- The Fedwire Funds Service ISO 20022 Implementation Guide and Technical Guide
+## Contributing
 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- ISO 20022 Standard (www.iso20022.org)
-- [Federal Reserve Financial Services](https://www.frbservices.org/) for Fedwire specifications 
