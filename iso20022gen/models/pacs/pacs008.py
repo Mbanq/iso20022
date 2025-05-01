@@ -1,119 +1,18 @@
 # pacs008.py
 
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from random import choices
 from string import ascii_letters, digits
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from uuid import uuid4
 
-
-@dataclass
-class ClrSysId:
-    Cd: str = "USABA"
-
-@dataclass
-class PstlAdr:
-    AdrLine: List[str]
-
-@dataclass
-class ClrSysMmbId:
-    ClrSysId: ClrSysId
-    MmbId: str
-
-
-@dataclass
-class FinInstnId:
-    ClrSysMmbId: ClrSysMmbId
-    Nm: Optional[str] = None
-    PstlAdr: Optional[PstlAdr] = None
-
-
-@dataclass
-class InstgAgt:
-    FinInstnId: FinInstnId
-
-
-@dataclass
-class InstdAgt:
-    FinInstnId: FinInstnId
-
-
-@dataclass
-class Othr:
-    Id: str
-
-
-@dataclass
-class IdAcct:
-    Othr: Othr
-
-
-@dataclass
-class DbtrAcct:
-    Id: IdAcct
-
-
-@dataclass
-class CdtrAcct:
-    Id: IdAcct
-
-
-
-@dataclass
-class Dbtr:
-    Nm: str
-    PstlAdr: PstlAdr
-
-
-@dataclass
-class Cdtr:
-    Nm: str
-    PstlAdr: PstlAdr
-
-
-@dataclass
-class DbtrAgt:
-    FinInstnId: FinInstnId
-
-
-@dataclass
-class CdtrAgt:
-    FinInstnId: FinInstnId
-
-
-@dataclass
-class PmtId:
-    EndToEndId: str
-    UETR: str
-
-
-@dataclass
-class LclInstrm:
-    Prtry: str = "CTRC"
-
-
-@dataclass
-class PmtTpInf:
-    LclInstrm: LclInstrm
-
-
-@dataclass
-class SttlmInf:
-    SttlmMtd: str = "CLRG"
-    ClrSys: Dict[str, Any] = field(default_factory=lambda: {"Cd": "FDW"})
-
-
-@dataclass
-class GrpHdr:
-    MsgId: str
-    CreDtTm: str
-    NbOfTxs: str
-    SttlmInf: SttlmInf
+from iso20022gen.models.common import *
 
 
 @dataclass
 class CdtTrfTxInf:
+    """Credit transfer transaction information."""
     PmtId: PmtId
     PmtTpInf: PmtTpInf
     IntrBkSttlmAmt: Dict[str, Any]
@@ -128,18 +27,34 @@ class CdtTrfTxInf:
     CdtrAgt: CdtrAgt
     Cdtr: Cdtr
     CdtrAcct: CdtrAcct
-    # Now the one default‐valued field goes last:
-
 
 
 @dataclass
 class FIToFICstmrCdtTrf:
+    """Financial institution to financial institution customer credit transfer."""
     GrpHdr: GrpHdr
     CdtTrfTxInf: CdtTrfTxInf
+    
+    def __post_init__(self):
+        """Validate that SttlmInf is provided for PACS.008 messages."""
+        if not self.GrpHdr.SttlmInf:
+            raise ValueError("SttlmInf is required for PACS.008 messages")
+
 
 @dataclass
 class Document:
+    """PACS.008 document."""
     FIToFICstmrCdtTrf: FIToFICstmrCdtTrf
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert this model to a dictionary representation for XML generation."""
+        return {
+            "Document": {
+                "@xmlns:pacs": "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08",
+                **asdict(self)
+            }
+        }
+
     @classmethod
     def from_payload(cls, payload: Dict[str, Any]) -> "Document":
         msg = payload["fedWireMessage"]
@@ -174,6 +89,7 @@ class Document:
         grp_hdr = GrpHdr(
             MsgId=message_id,
             CreDtTm=datetime.now(timezone.utc).isoformat(),
+            #Need to change this and make it dynamic
             NbOfTxs="1",
             SttlmInf=SttlmInf()
         )
