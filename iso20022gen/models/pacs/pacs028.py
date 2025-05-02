@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from uuid import uuid4
 
 from iso20022gen.models.common import (
@@ -54,33 +54,45 @@ class Document:
     @classmethod
     def from_payload(
         cls,
-        msg_id: str,
-        original_msg_id: str,
-        original_msg_nm_id: str = "pacs.008.001.08",
-        original_creation_datetime: Optional[str] = None,
-        original_instr_id: Optional[str] = None,
-        original_end_to_end_id: Optional[str] = None,
-        original_uetr: Optional[str] = None,
-        instg_agt_id: Optional[str] = None,
-        instd_agt_id: Optional[str] = None
+        payload: Dict[str, Any]
     ) -> "Document":
         """
         Create a payment status request document from payload data.
         
         Args:
-            msg_id: Message ID for this request
-            original_msg_id: Original message ID being queried
-            original_msg_nm_id: Original message type (default: pacs.008.001.08)
-            original_creation_datetime: Original message creation time (ISO format)
-            original_instr_id: Original instruction ID
-            original_end_to_end_id: Original end-to-end ID
-            original_uetr: Original UETR
-            instg_agt_id: Instructing agent ID (ABA number)
-            instd_agt_id: Instructed agent ID (ABA number)
+            payload: A dictionary containing the payload data
             
         Returns:
             Document: A PACS.028 document
         """
+        # Extract fedWireMessage data
+        fed_wire_message = payload.get("fedWireMessage", {})
+        input_message_data = fed_wire_message.get("inputMessageAccountabilityData", {})
+        
+        # Extract message ID components
+        input_cycle_date = input_message_data.get("inputCycleDate", "20250101")
+        input_source = input_message_data.get("inputSource", "MBANQ")
+        input_sequence_number = input_message_data.get("inputSequenceNumber", "000000001")
+        
+        # Construct message ID
+        msg_id = f"{input_cycle_date}{input_source}{input_sequence_number}"
+        
+        # Get pacs.028 specific fields
+        original_msg_id = payload.get("original_msg_id", "UNKNOWN")
+        original_msg_nm_id = payload.get("original_msg_nm_id", "pacs.008.001.08")
+        original_creation_datetime = payload.get("original_creation_datetime")
+        
+        # Get optional fields
+        original_instr_id = payload.get("original_instr_id")
+        original_end_to_end_id = payload.get("original_end_to_end_id")
+        original_uetr = payload.get("original_uetr")
+        
+        # Get sender/receiver information
+        sender_info = fed_wire_message.get("senderDepositoryInstitution", {})
+        receiver_info = fed_wire_message.get("receiverDepositoryInstitution", {})
+        instg_agt_id = sender_info.get("senderABANumber")
+        instd_agt_id = receiver_info.get("receiverABANumber")
+            
         # Set default creation time to now if not provided
         if not original_creation_datetime:
             original_creation_datetime = datetime.now(timezone.utc).isoformat()
