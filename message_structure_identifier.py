@@ -15,7 +15,7 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 # Import the fedwire module functions
-from iso20022gen.models.fedwire import generate_fedwire_message
+from iso20022gen.models.fedwire import generate_fedwire_message, generate_message_structure
 
 
 def load_sample_payload(sample_file_path: str) -> Dict[str, Any]:
@@ -107,7 +107,6 @@ def main():
             # Use the default sample file in the iso20022gen/sample_files directory
             sample_path = os.path.abspath(os.path.join(
                 os.path.dirname(__file__),
-                'iso20022gen',
                 'sample_files',
                 'sample_payload.json'
             ))

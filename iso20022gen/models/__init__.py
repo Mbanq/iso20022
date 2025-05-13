@@ -3,10 +3,9 @@ ISO 20022 data models package.
 """
 
 from dataclasses import asdict
-from iso20022gen.models.head import AppHdr
+from iso20022gen.models.bah.apphdr import AppHdr
 from iso20022gen.models.pacs import Document, FIToFICstmrCdtTrf
-from iso20022gen.models.xml_converter import dict_to_xml
-
+from iso20022gen.models.helpers import dict_to_xml
 
 def model_to_xml(model, prefix=None, namespace=None):
     """Convert model to XML using the dictionary-based approach."""

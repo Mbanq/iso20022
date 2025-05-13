@@ -6,12 +6,12 @@ from typing import Dict, Any, Tuple, Optional, List, Union
 from datetime import datetime
 
 # Fix imports to use the correct package structure
-from iso20022gen.models.head.apphdr import AppHdr
+from iso20022gen.models.bah.apphdr import AppHdr
 from iso20022gen.models.pacs.pacs008 import Document as Pacs008Document
 from iso20022gen.models.pacs.pacs028 import Document as Pacs028Document
-from iso20022gen.models.xml_converter import dict_to_xml
+from iso20022gen.models.helpers import dict_to_xml
 
-def parse_message_xsd(xsd_path, message_code):
+def parse_message_envelope(xsd_path, message_code):
     """
     Parse the XSD file and return data for a specific message code.
     
@@ -208,7 +208,7 @@ def generate_fedwire_message(message_code: str, payload: Dict[str, Any], xsd_pat
         complete_structure = None
         try:
             # Get the specific message data - use full message_code, not just message_type
-            element_name, target_ns, root_element_name, message_container_name = parse_message_xsd(xsd_path, message_code)
+            element_name, target_ns, root_element_name, message_container_name = parse_message_envelope(xsd_path, message_code)
             
             # Create the complete XML structure with the actual generated content
             app_hdr_lines = app_hdr_xml.strip().split('\n')
