@@ -6,6 +6,8 @@ A Python library for generating ISO20022 compliant financial messages, with a fo
 
 - Generate ISO20022 compliant XML messages
 - Support for pacs.008 (FIToFICstmrCdtTrf) message type
+- Support for pacs.028 (FIToFIPmtStsRq) message type
+- Generate Fedwire ISO20022 compliant XML messages
 - Automatic handling of namespaces and XML structure
 - Clean XML output with no empty optional fields
 - Support for both AppHdr and Document components
@@ -21,7 +23,7 @@ cd iso20022
 pip install -e .
 ```
 
-## Usage
+## FedWire Messages
 
 ### Command Line Interface
 
@@ -44,7 +46,7 @@ python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.
 python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --generate --output-file output.xml
 ```
 
-### Python API
+### Python
 
 You can also use the library programmatically in your Python code:
 
@@ -153,13 +155,6 @@ The web application allows you to:
 - Enter or upload a JSON payload
 - Select a message type from the dropdown
 - Generate and download ISO20022 messages
-
-### Web Application Structure
-
-The web application is organized in the `webapp` directory:
-- `webapp/app.py` - The Flask application
-- `webapp/templates/` - HTML templates
-- `webapp/requirements.txt` - Python dependencies
 
 ## Important Notice on Proprietary Envelope
 
