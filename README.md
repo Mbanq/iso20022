@@ -23,51 +23,78 @@ pip install -e .
 
 ## Usage
 
-### Dictionary-based Approach
+### Command Line Interface
 
-Here's an example of generating an ISO20022 message:
+The package provides a command-line interface for generating ISO20022 messages:
+
+```bash
+# Generate a message structure for a specific message code
+python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08
+
+# Generate a complete message using a sample payload
+python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --generate
+
+# Specify a custom XSD file
+python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --xsd-file path/to/custom.xsd
+
+# Specify a custom sample payload file
+python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --generate --sample-file path/to/payload.json
+
+# Specify an output file
+python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --generate --output-file output.xml
+```
+
+### Python API
+
+You can also use the library programmatically in your Python code:
 
 ```python
 import json
-from dataclasses import asdict
-from iso20022gen.models.apphdr import AppHdr
-from iso20022gen.models.pacs008 import Document
-from iso20022gen.models.xml_converter import dict_to_xml
+from iso20022gen.models.fedwire import generate_fedwire_message
 
 # Load your payment data
-with open("iso20022gen/examples/sample_payment.json", "r") as f:
+with open("sample_files/sample_payload.json", "r") as f:
     payload = json.load(f)
 
-# Create AppHdr and Document objects
-app_hdr = AppHdr.from_payload(payload)
-document = Document.from_payload(payload)
+# Specify the message code and XSD path
+message_code = "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08"
+xsd_path = "proprietary_xsd/fedwirefunds-incoming.xsd"
 
-# Convert to dictionaries
-app_hdr_dict = asdict(app_hdr)
-document_dict = asdict(document)
-
-# Generate XML with proper namespaces
-app_hdr_xml = dict_to_xml(
-    app_hdr_dict,
-    prefix="head",
-    namespace="urn:iso:std:iso:20022:tech:xsd:head.001.001.03",
-    root="AppHdr"
-)
-document_xml = dict_to_xml(
-    document_dict,
-    prefix="pacs",
-    namespace="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08",
-    root="Document"
-)
-
-# Combine XMLs with XML declaration
-xml_decl = '<?xml version="1.0" encoding="utf-8"?>'
-combined_xml = f"{xml_decl}\n{app_hdr_xml}\n{document_xml}"
+# Generate the message
+app_hdr_xml, document_xml, complete_message = generate_fedwire_message(message_code, payload, xsd_path)
 
 # Save to file
 with open("output.xml", "w") as f:
-    f.write(combined_xml)
+    f.write(complete_message)
 ```
+
+### Web Application
+
+The easiest way to generate ISO20022 messages is through the web application:
+
+```bash
+# Install the package with web application dependencies
+pip install -e .[webapp]
+
+# Run the web application
+python run_webapp.py
+```
+
+This will start a web server at http://localhost:8888 where you can:
+1. Select a message type from the dropdown menu
+2. Upload a proprietary XSD file
+3. Enter or upload a JSON payload
+4. Generate and download the ISO20022 message
+
+### Supported Message Types
+
+The library currently supports the following message types:
+
+- **pacs.008.001.08** - Customer Credit Transfer
+  - Full support with complete model class and validation
+  
+- **pacs.028.001.03** - Payment Status Request
+  - Full support with complete model class and validation
 
 ### Sample Payload Format
 
@@ -104,6 +131,35 @@ Generate a sample file:
 ```bash
 python generate_sample_payment_file.py
 ```
+
+## Web Application
+
+The project includes a web application that allows you to generate ISO20022 messages through a user-friendly interface:
+
+1. Install the package with web application dependencies:
+   ```bash
+   pip install -e .[webapp]
+   ```
+
+2. Run the web application using the provided script:
+   ```bash
+   python run_webapp.py
+   ```
+
+3. Open your browser and navigate to http://localhost:8888
+
+The web application allows you to:
+- Upload a proprietary XSD file
+- Enter or upload a JSON payload
+- Select a message type from the dropdown
+- Generate and download ISO20022 messages
+
+### Web Application Structure
+
+The web application is organized in the `webapp` directory:
+- `webapp/app.py` - The Flask application
+- `webapp/templates/` - HTML templates
+- `webapp/requirements.txt` - Python dependencies
 
 ## Important Notice on Proprietary Envelope
 
