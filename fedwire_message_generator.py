@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-ISO20022 Message Structure Identifier
+Fedwire Message Generator
 
-This script parses an XSD file containing ISO20022 message definitions,
-identifies the structure of a specific message code, and can generate
-complete ISO20022 messages using models and sample data.
+This script generates ISO20022-compliant Fedwire messages by parsing an XSD file,
+identifying the structure of a specific message code, and generating
+complete Fedwire messages using models and sample data.
 """
 
 import os
@@ -140,8 +140,38 @@ def main():
     # If no specific action is specified, just show the message structure
     if args.message_code:
         try:
-            # Generate and display the message structure
-            structure = generate_message_structure(args.message_code, xsd_path)
+            # Use the appropriate sample payload based on message type
+            sample_file_path = ''
+            if "pacs.008" in args.message_code:
+                sample_file_path = os.path.join(
+                    os.path.dirname(__file__),
+                    'sample_files',
+                    'sample_payload.json'
+                )
+            elif "pacs.028" in args.message_code:
+                sample_file_path = os.path.join(
+                    os.path.dirname(__file__),
+                    'sample_files',
+                    'sample_pacs028_payload.json'
+                )
+            else:
+                # Default to the standard sample payload
+                sample_file_path = os.path.join(
+                    os.path.dirname(__file__),
+                    'sample_files',
+                    'sample_payload.json'
+                )
+            
+            # Check if the sample file exists
+            if not os.path.exists(sample_file_path):
+                print(f"Error: Sample file not found at {sample_file_path}")
+                sys.exit(1)
+                
+            # Load the sample payload
+            sample_payload = load_sample_payload(sample_file_path)
+            
+            # Generate the message structure
+            app_hdr_xml, document_xml, structure = generate_fedwire_message(args.message_code, sample_payload, xsd_path)
             if structure:
                 print("Message Structure:")
                 print(structure)
