@@ -98,7 +98,7 @@ class AppHdr:
     def from_iso20022(cls, data: Dict[str, Any])-> "AppHdr":
 
         # 1. Extract AppHdr data
-        app_hdr_data = data['FedwireFundsIncoming']['FedwireFundsIncomingMessage']['FedwireFundsCustomerCreditTransfer']['AppHdr']
+        app_hdr_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['AppHdr']
 
         # 2. Instantiate the AppHdr data class
         app_hdr = AppHdr(
