@@ -1,6 +1,6 @@
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 
 @dataclass
@@ -93,3 +93,22 @@ class AppHdr:
             ),
             CreDt=datetime.now(timezone.utc).isoformat(),
         )
+
+    @classmethod
+    def from_iso20022(cls, data: Dict[str, Any])-> "AppHdr":
+
+        # 1. Extract AppHdr data
+        app_hdr_data = data['FedwireFundsIncoming']['FedwireFundsIncomingMessage']['FedwireFundsCustomerCreditTransfer']['AppHdr']
+
+        # 2. Instantiate the AppHdr data class
+        app_hdr = AppHdr(
+            Fr=Fr(FIId=FIId(FinInstnId=FinInstnId(ClrSysMmbId=ClrSysMmbId(**app_hdr_data['Fr']['FIId']['FinInstnId']['ClrSysMmbId'])))),
+            To=To(FIId=FIId(FinInstnId=FinInstnId(ClrSysMmbId=ClrSysMmbId(**app_hdr_data['To']['FIId']['FinInstnId']['ClrSysMmbId'])))),
+            BizMsgIdr=app_hdr_data['BizMsgIdr'],
+            MsgDefIdr=app_hdr_data['MsgDefIdr'],
+            BizSvc=app_hdr_data['BizSvc'],
+            MktPrctc=MktPrctc(**app_hdr_data['MktPrctc']),
+            CreDt=app_hdr_data['CreDt']
+        )
+
+        return app_hdr
