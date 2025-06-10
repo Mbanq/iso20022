@@ -9,7 +9,15 @@ from iso20022gen.models.common.account import IdAcct
 @dataclass
 class PstlAdr:
     """Postal address information."""
-    AdrLine: List[str]
+    StrtNm: Optional[str] = None
+    BldgNb: Optional[str] = None
+    Flr: Optional[str] = None
+    Room: Optional[str] = None
+    PstCd: Optional[str] = None
+    TwnNm: Optional[str] = None
+    CtrySubDvsn: Optional[str] = None
+    Ctry: Optional[str] = None
+    AdrLine: Optional[List[str]] = None
 
 
 @dataclass
