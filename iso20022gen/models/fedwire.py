@@ -8,8 +8,10 @@ from datetime import datetime
 # Fix imports to use the correct package structure
 from iso20022gen.models.bah.apphdr import AppHdr
 from iso20022gen.models.pacs.pacs008 import Document as Pacs008Document
+from iso20022gen.models.pacs.pacs008 import CdtTrfTxInf 
 from iso20022gen.models.pacs.pacs028 import Document as Pacs028Document
 from iso20022gen.models.helpers import dict_to_xml
+from iso20022gen.models.helpers import parse_xml_to_json
 
 def parse_message_envelope(xsd_path, message_code):
     """
@@ -235,3 +237,99 @@ def generate_fedwire_message(message_code: str, payload: Dict[str, Any], xsd_pat
     except Exception as e:
         print(f"Error generating message: {e}")
         return None, None, None
+
+def map_to_json_format(app_hdr, cdt_trf_tx_inf):
+    """Maps AppHdr and CdtTrfTxInf data classes to the Fedwire JSON format. Supports PACS008 Only"""
+
+    # Helper to safely extract address lines
+    def get_adr_line(pstl_adr, index):
+        if not pstl_adr:
+            return ""
+
+        constructed_line = ""
+        
+        if index == 0:  # Line 1: Street Name and Building Number
+            line_parts = filter(None, [pstl_adr.StrtNm, pstl_adr.BldgNb])
+            constructed_line = " ".join(line_parts).strip()
+        elif index == 1:  # Line 2: Floor and Room
+            flr_part = f"Flr {pstl_adr.Flr}" if pstl_adr.Flr else None
+            room_part = pstl_adr.Room
+            line_parts = filter(None, [flr_part, room_part])
+            constructed_line = ", ".join(line_parts).strip()
+        elif index == 2:  # Line 3: Town, State/Province PostalCode, Country
+            town_part = pstl_adr.TwnNm
+            # Combine State/Province and Postal Code, e.g., "CA 90210" or "CA" or "90210"
+            state_zip_part = " ".join(filter(None, [pstl_adr.CtrySubDvsn, pstl_adr.PstCd])).strip()
+            country_part = pstl_adr.Ctry
+            
+            # Combine all parts of Line 3 with commas, filtering out empty ones
+            all_line3_parts = filter(None, [town_part, state_zip_part, country_part])
+            constructed_line = ", ".join(all_line3_parts).strip()
+        
+        # Return the constructed line if not empty, otherwise fallback to AdrLine
+        if constructed_line:
+            return constructed_line
+        elif pstl_adr.AdrLine and len(pstl_adr.AdrLine) > index and pstl_adr.AdrLine[index]:
+            return pstl_adr.AdrLine[index] # Return AdrLine if it's not empty
+        else:
+            return ""
+
+    fedwire_message = {
+        "fedWireMessage": {
+            "inputMessageAccountabilityData": {
+                "inputCycleDate": cdt_trf_tx_inf.IntrBkSttlmDt.replace('-', ''),
+                "inputSource": app_hdr.BizMsgIdr[8:13],
+                "inputSequenceNumber": app_hdr.BizMsgIdr[13:]
+            },
+            "amount": {
+                "amount": str(int(float(cdt_trf_tx_inf.IntrBkSttlmAmt['#text']) * 100))
+            },
+            "senderDepositoryInstitution": {
+                "senderABANumber": cdt_trf_tx_inf.InstgAgt.FinInstnId.ClrSysMmbId.MmbId,
+                "senderShortName": cdt_trf_tx_inf.DbtrAgt.FinInstnId.Nm or ""
+            },
+            "receiverDepositoryInstitution": {
+                "receiverABANumber": cdt_trf_tx_inf.InstdAgt.FinInstnId.ClrSysMmbId.MmbId,
+                "receiverShortName": cdt_trf_tx_inf.CdtrAgt.FinInstnId.Nm or ""
+            },
+            "originator": {
+                "personal": {
+                    "name": cdt_trf_tx_inf.Dbtr.Nm,
+                    "address": {
+                        "addressLineOne": get_adr_line(cdt_trf_tx_inf.Dbtr.PstlAdr, 0),
+                        "addressLineTwo": get_adr_line(cdt_trf_tx_inf.Dbtr.PstlAdr, 1),
+                        "addressLineThree": get_adr_line(cdt_trf_tx_inf.Dbtr.PstlAdr, 2)
+                    },
+                    "identifier": cdt_trf_tx_inf.DbtrAcct.Id.Othr.Id
+                }
+            },
+            "beneficiary": {
+                "personal": {
+                    "name": cdt_trf_tx_inf.Cdtr.Nm,
+                    "address": {
+                        "addressLineOne": get_adr_line(cdt_trf_tx_inf.Cdtr.PstlAdr, 0),
+                        "addressLineTwo": get_adr_line(cdt_trf_tx_inf.Cdtr.PstlAdr, 1),
+                        "addressLineThree": get_adr_line(cdt_trf_tx_inf.Cdtr.PstlAdr, 2)
+                    },
+                    "identifier": cdt_trf_tx_inf.CdtrAcct.Id.Othr.Id
+                }
+            }
+        }
+    }
+    return fedwire_message
+    
+
+def generate_fedwire_payload(xml_file):
+
+    # 1. Parse the XML file to JSON
+    json_output = parse_xml_to_json(xml_file)
+    data = json.loads(json_output)
+
+    # 2. Instantiate the AppHdr & CdtTrfTxInf data class
+    app_hdr_instance = AppHdr.from_iso20022(data)
+    cdt_trf_tx_inf= CdtTrfTxInf.from_iso20022(data)
+
+    # 3. Map to Fedwire JSON format
+    fedwire_json = map_to_json_format(app_hdr_instance, cdt_trf_tx_inf)
+    
+    return fedwire_json

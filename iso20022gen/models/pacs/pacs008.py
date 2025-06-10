@@ -29,6 +29,44 @@ class CdtTrfTxInf:
     CdtrAcct: CdtrAcct
 
 
+    @staticmethod
+    def build_fin_instn_id(data):
+        return FinInstnId(
+            ClrSysMmbId=ClrSysMmbId(
+                ClrSysId=ClrSysId(**data['ClrSysMmbId']['ClrSysId']),
+                MmbId=data['ClrSysMmbId']['MmbId']
+            ),
+            Nm=data.get('Nm'),
+            PstlAdr=PstlAdr(**data['PstlAdr']) if data.get('PstlAdr') else None
+        )
+
+    @classmethod
+    def from_iso20022(cls, data: Dict[str, Any]) -> "CdtTrfTxInf":
+
+        # 1. Extract CdtTrfTxInf data
+        cdt_trf_tx_inf_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['Document']['FIToFICstmrCdtTrf']['CdtTrfTxInf']
+
+        # 2. Instantiate the CdtTrfTxInf data class
+        cdt_trf_tx_inf = CdtTrfTxInf(
+            PmtId=PmtId(**cdt_trf_tx_inf_data['PmtId']),
+            PmtTpInf=PmtTpInf(LclInstrm=LclInstrm(**cdt_trf_tx_inf_data['PmtTpInf']['LclInstrm'])),
+            IntrBkSttlmAmt=cdt_trf_tx_inf_data['IntrBkSttlmAmt'],
+            IntrBkSttlmDt=cdt_trf_tx_inf_data['IntrBkSttlmDt'],
+            InstdAmt=cdt_trf_tx_inf_data['InstdAmt'],
+            ChrgBr=cdt_trf_tx_inf_data['ChrgBr'],
+            InstgAgt=InstgAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstgAgt']['FinInstnId'])),
+            InstdAgt=InstdAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstdAgt']['FinInstnId'])),
+            Dbtr=Dbtr(Nm=cdt_trf_tx_inf_data['Dbtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Dbtr']['PstlAdr'])),
+            DbtrAcct=DbtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['DbtrAcct']['Id']['Othr']))),
+            DbtrAgt=DbtrAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['DbtrAgt']['FinInstnId'])),
+            CdtrAgt=CdtrAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['CdtrAgt']['FinInstnId'])),
+            Cdtr=Cdtr(Nm=cdt_trf_tx_inf_data['Cdtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Cdtr']['PstlAdr'])),
+            CdtrAcct=CdtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['CdtrAcct']['Id']['Othr'])))
+        )
+
+        return cdt_trf_tx_inf
+
+
 @dataclass
 class FIToFICstmrCdtTrf:
     """Financial institution to financial institution customer credit transfer."""
@@ -124,15 +162,15 @@ class Document:
             DbtrAgt=DbtrAgt(
                 FinInstnId=FinInstnId(
                     ClrSysMmbId=ClrSysMmbId(ClrSysId(), msg["senderDepositoryInstitution"]["senderABANumber"]),
-                    Nm="vamsi",
+                    Nm=msg["senderDepositoryInstitution"]["senderShortName"],
                     PstlAdr=PstlAdr(AdrLine=adr_lines(msg["originator"]["personal"]))
                 )
             ),
             CdtrAgt=CdtrAgt(
                 FinInstnId=FinInstnId(
-                    ClrSysMmbId=ClrSysMmbId(ClrSysId(), msg["senderDepositoryInstitution"]["senderABANumber"]),
-                    Nm="vamsi",
-                    PstlAdr=PstlAdr(AdrLine=adr_lines(msg["originator"]["personal"]))
+                    ClrSysMmbId=ClrSysMmbId(ClrSysId(), msg["receiverDepositoryInstitution"]["receiverABANumber"]),
+                    Nm=msg["receiverDepositoryInstitution"]["receiverShortName"],
+                    PstlAdr=PstlAdr(AdrLine=adr_lines(msg["beneficiary"]["personal"]))
                 )
             ),
             Cdtr=Cdtr(
@@ -145,3 +183,6 @@ class Document:
         )
 
         return cls(FIToFICstmrCdtTrf=FIToFICstmrCdtTrf(GrpHdr=grp_hdr, CdtTrfTxInf=cdt))
+
+    
+    
