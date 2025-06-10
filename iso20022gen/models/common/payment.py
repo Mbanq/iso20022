@@ -9,6 +9,8 @@ class PmtId:
     """Payment identification."""
     EndToEndId: str
     UETR: str
+    InstrId: Optional[str] = None
+    TxId: Optional[str] = None
 
 
 @dataclass
