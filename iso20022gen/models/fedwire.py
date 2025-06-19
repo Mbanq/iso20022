@@ -7,9 +7,10 @@ from datetime import datetime
 
 # Fix imports to use the correct package structure
 from iso20022gen.models.bah.apphdr import AppHdr
-from iso20022gen.models.pacs.pacs008 import Document as Pacs008Document
-from iso20022gen.models.pacs.pacs008 import CdtTrfTxInf 
+from iso20022gen.models.pacs.pacs008 import Document as Pacs008Document 
 from iso20022gen.models.pacs.pacs028 import Document as Pacs028Document
+from iso20022gen.models.pacs.pacs002 import FIToFIPmtStsRpt
+from iso20022gen.models.pacs.pacs008 import FIToFICstmrCdtTrf
 from iso20022gen.models.helpers import dict_to_xml
 from iso20022gen.models.helpers import parse_xml_to_json
 
@@ -32,7 +33,7 @@ def parse_message_envelope(xsd_path, message_code):
         raise ValueError("message_code parameter is required")
     
     # Define the namespaces
-    namespaces = {
+    namespaces = { 
         'xs': 'http://www.w3.org/2001/XMLSchema'
     }
     
@@ -238,7 +239,7 @@ def generate_fedwire_message(message_code: str, payload: Dict[str, Any], xsd_pat
         print(f"Error generating message: {e}")
         return None, None, None
 
-def map_to_json_format(app_hdr, cdt_trf_tx_inf):
+def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf):
     """Maps AppHdr and CdtTrfTxInf data classes to the Fedwire JSON format. Supports PACS008 Only"""
 
     # Helper to safely extract address lines
@@ -277,12 +278,12 @@ def map_to_json_format(app_hdr, cdt_trf_tx_inf):
     fedwire_message = {
         "fedWireMessage": {
             "inputMessageAccountabilityData": {
-                "inputCycleDate": cdt_trf_tx_inf.IntrBkSttlmDt.replace('-', ''),
+                "inputCycleDate": app_hdr.BizMsgIdr[:8],
                 "inputSource": app_hdr.BizMsgIdr[8:13],
                 "inputSequenceNumber": app_hdr.BizMsgIdr[13:]
             },
             "amount": {
-                "amount": str(int(float(cdt_trf_tx_inf.IntrBkSttlmAmt['#text']) * 100))
+                "amount": str(int(float(cdt_trf_tx_inf.IntrBkSttlmAmt['#text'])))
             },
             "senderDepositoryInstitution": {
                 "senderABANumber": cdt_trf_tx_inf.InstgAgt.FinInstnId.ClrSysMmbId.MmbId,
@@ -317,19 +318,55 @@ def map_to_json_format(app_hdr, cdt_trf_tx_inf):
         }
     }
     return fedwire_message
+
+
+def pacs_002_to_fedwire_json(app_hdr, pmt_sts_req):
+    """Maps AppHdr and FIToFIPmtStsRpt data classes to the Fedwire JSON format."""
+
+    #TODO: Add status and reason
+    fedwire_message = {
+        "fedWireMessage": {
+            "inputMessageAccountabilityData": {
+                "inputCycleDate": pmt_sts_req.TxInfAndSts.OrgnlGrpInf['OrgnlMsgId'][:8],
+                "inputSource": pmt_sts_req.TxInfAndSts.OrgnlGrpInf['OrgnlMsgId'][8:13],
+                "inputSequenceNumber": pmt_sts_req.TxInfAndSts.OrgnlGrpInf['OrgnlMsgId'][13:]
+            },
+            "outputMessageAccountabilityData": {
+                "outputCycleDate": pmt_sts_req.GrpHdr.MsgId[:8],
+                "outputSource": pmt_sts_req.GrpHdr.MsgId[8:13],
+                "outputSequenceNumber": pmt_sts_req.GrpHdr.MsgId[13:]
+            }
+        }
+    }
+    return fedwire_message
     
 
-def generate_fedwire_payload(xml_file):
+def generate_fedwire_payload(xml_file, message_code):
 
     # 1. Parse the XML file to JSON
     json_output = parse_xml_to_json(xml_file)
     data = json.loads(json_output)
+    print(message_code)
 
     # 2. Instantiate the AppHdr & CdtTrfTxInf data class
-    app_hdr_instance = AppHdr.from_iso20022(data)
-    cdt_trf_tx_inf= CdtTrfTxInf.from_iso20022(data)
+    
+    if message_code == "pacs.008.001.08":
 
-    # 3. Map to Fedwire JSON format
-    fedwire_json = map_to_json_format(app_hdr_instance, cdt_trf_tx_inf)
+        app_hdr_instance = AppHdr.from_iso20022(data,message_code)
+        cdt_trf_tx_inf= FIToFICstmrCdtTrf.from_iso20022(data)
+
+        # 3. Map to Fedwire JSON format
+        fedwire_json = pacs_008_to_fedwire_json(app_hdr_instance, cdt_trf_tx_inf)
+
+    elif message_code == "pacs.002.001.10":
+
+        app_hdr_instance = AppHdr.from_iso20022(data,message_code)
+        pmt_sts_req= FIToFIPmtStsRpt.from_iso20022(data)
+        
+        # 3. Map to Fedwire JSON format
+        fedwire_json = pacs_002_to_fedwire_json(app_hdr_instance, pmt_sts_req)
+
+    else:
+        raise ValueError(f"Unsupported message code: {message_code}")
     
     return fedwire_json
