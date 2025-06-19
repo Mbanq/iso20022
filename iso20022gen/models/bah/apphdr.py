@@ -95,10 +95,13 @@ class AppHdr:
         )
 
     @classmethod
-    def from_iso20022(cls, data: Dict[str, Any])-> "AppHdr":
+    def from_iso20022(cls, data: Dict[str, Any],message_code)-> "AppHdr":
 
         # 1. Extract AppHdr data
-        app_hdr_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['AppHdr']
+        if message_code == "pacs.008.001.08":
+            app_hdr_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['AppHdr']
+        elif message_code == "pacs.002.001.10":
+            app_hdr_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsPaymentStatus']['AppHdr']
 
         # 2. Instantiate the AppHdr data class
         app_hdr = AppHdr(

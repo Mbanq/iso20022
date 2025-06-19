@@ -40,6 +40,18 @@ class CdtTrfTxInf:
             PstlAdr=PstlAdr(**data['PstlAdr']) if data.get('PstlAdr') else None
         )
 
+
+@dataclass
+class FIToFICstmrCdtTrf:
+    """Financial institution to financial institution customer credit transfer."""
+    GrpHdr: GrpHdr
+    CdtTrfTxInf: CdtTrfTxInf
+    
+    def __post_init__(self):
+        """Validate that SttlmInf is provided for PACS.008 messages."""
+        if not self.GrpHdr.SttlmInf:
+            raise ValueError("SttlmInf is required for PACS.008 messages")
+
     @classmethod
     def from_iso20022(cls, data: Dict[str, Any]) -> "CdtTrfTxInf":
 
@@ -65,18 +77,6 @@ class CdtTrfTxInf:
         )
 
         return cdt_trf_tx_inf
-
-
-@dataclass
-class FIToFICstmrCdtTrf:
-    """Financial institution to financial institution customer credit transfer."""
-    GrpHdr: GrpHdr
-    CdtTrfTxInf: CdtTrfTxInf
-    
-    def __post_init__(self):
-        """Validate that SttlmInf is provided for PACS.008 messages."""
-        if not self.GrpHdr.SttlmInf:
-            raise ValueError("SttlmInf is required for PACS.008 messages")
 
 
 @dataclass

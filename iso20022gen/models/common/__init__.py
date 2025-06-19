@@ -9,7 +9,7 @@ from iso20022gen.models.common.customer import (
     Cdtr, CdtrAcct, CdtrAgt
 )
 from iso20022gen.models.common.payment import (
-    PmtId, LclInstrm, PmtTpInf, SttlmInf, GrpHdr
+    PmtId, LclInstrm, PmtTpInf, SttlmInf, GrpHdr, OrgnlGrpInf
 )
 
 __all__ = [
@@ -22,5 +22,5 @@ __all__ = [
     "Cdtr", "CdtrAcct", "CdtrAgt",
     
     # Payment models
-    "PmtId", "LclInstrm", "PmtTpInf", "SttlmInf", "GrpHdr"
+    "PmtId", "LclInstrm", "PmtTpInf", "SttlmInf", "GrpHdr", "OrgnlGrpInf"
 ]

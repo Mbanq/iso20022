@@ -7,17 +7,8 @@ from uuid import uuid4
 
 from iso20022gen.models.common import (
     PstlAdr, ClrSysId, ClrSysMmbId, FinInstnId,
-    InstgAgt, InstdAgt, GrpHdr
+    InstgAgt, InstdAgt, GrpHdr, OrgnlGrpInf
 )
-
-
-@dataclass
-class OrgnlGrpInf:
-    """Original group information."""
-    OrgnlMsgId: str
-    OrgnlMsgNmId: str
-    OrgnlCreDtTm: str
-
 
 @dataclass
 class TxInf:

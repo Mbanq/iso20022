@@ -39,3 +39,10 @@ class GrpHdr:
     CreDtTm: str
     NbOfTxs: Optional[NbOfTxs] = None
     SttlmInf: Optional[SttlmInf] = None
+
+@dataclass
+class OrgnlGrpInf:
+    """Original group information."""
+    OrgnlMsgId: str
+    OrgnlMsgNmId: str
+    OrgnlCreDtTm: str
