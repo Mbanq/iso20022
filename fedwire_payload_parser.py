@@ -1,31 +1,36 @@
 import json
 import sys
 import os
-import glob
+import argparse
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 
 from iso20022gen.models.fedwire import generate_fedwire_payload
 
-
 def main():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    sample_files_pattern = os.path.join(script_dir, 'sample_files', 'pacs.008.001.008_*.xml')
+    parser = argparse.ArgumentParser(description="Parse ISO20022 XML and convert to Fedwire JSON format.")
+    parser.add_argument("xml_file", help="Path to the input XML file.")
+    parser.add_argument("message_code", help="The message code (e.g., pacs.008.001.08, pacs.002.001.10).")
+    args = parser.parse_args()
 
-    xml_files = glob.glob(sample_files_pattern)
+    xml_file_path = args.xml_file
+    message_code = args.message_code
 
-    if not xml_files:
-        print(f"Error: No pacs.008.001.08 XML files found matching pattern {sample_files_pattern}.")
+    if not os.path.exists(xml_file_path):
+        print(f"Error: File not found at {xml_file_path}")
         sys.exit(1)
-    
-    latest_xml_file_path = max(xml_files, key=os.path.getctime)
-    
-    print(f"Processing file: {latest_xml_file_path}")
+
+    print(f"Processing file: {xml_file_path} with message code: {message_code}")
 
     try:
-        fedwire_json = generate_fedwire_payload(latest_xml_file_path)
-        output_filename = 'fedwire_payment_output.json' # This will be in CWD
+        fedwire_json = generate_fedwire_payload(xml_file_path, message_code)
+        
+        # Generate output filename
+        base_name = os.path.basename(xml_file_path)
+        file_name_without_ext = os.path.splitext(base_name)[0]
+        output_filename = f'{file_name_without_ext}_output.json'
+
         with open(output_filename, 'w') as f:
             json.dump(fedwire_json, f, indent=2)
         print(f"Successfully created {output_filename}")
