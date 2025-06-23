@@ -301,7 +301,7 @@ def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf):
                         "addressLineTwo": get_adr_line(cdt_trf_tx_inf.Dbtr.PstlAdr, 1),
                         "addressLineThree": get_adr_line(cdt_trf_tx_inf.Dbtr.PstlAdr, 2)
                     },
-                    "identifier": cdt_trf_tx_inf.DbtrAcct.Id.Othr.Id
+                    "identifier": cdt_trf_tx_inf.DbtrAcct.Id.Othr.Id if cdt_trf_tx_inf.DbtrAcct and hasattr(cdt_trf_tx_inf.DbtrAcct, 'Id') and hasattr(cdt_trf_tx_inf.DbtrAcct.Id, 'Othr') and hasattr(cdt_trf_tx_inf.DbtrAcct.Id.Othr, 'Id') else ""
                 }
             },
             "beneficiary": {
@@ -312,7 +312,7 @@ def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf):
                         "addressLineTwo": get_adr_line(cdt_trf_tx_inf.Cdtr.PstlAdr, 1),
                         "addressLineThree": get_adr_line(cdt_trf_tx_inf.Cdtr.PstlAdr, 2)
                     },
-                    "identifier": cdt_trf_tx_inf.CdtrAcct.Id.Othr.Id
+                    "identifier": cdt_trf_tx_inf.CdtrAcct.Id.Othr.Id if cdt_trf_tx_inf.CdtrAcct and hasattr(cdt_trf_tx_inf.CdtrAcct, 'Id') and hasattr(cdt_trf_tx_inf.CdtrAcct.Id, 'Othr') and hasattr(cdt_trf_tx_inf.CdtrAcct.Id.Othr, 'Id') else ""
                 }
             }
         }

@@ -1,0 +1,42 @@
+{
+  "fedWireMessage": {
+    "inputMessageAccountabilityData": {
+      "inputCycleDate": "20250129",
+      "inputSource": "QMGFN",
+      "inputSequenceNumber": "P3100011701290917FT01"
+    },
+    "amount": {
+      "amount": "77"
+    },
+    "senderDepositoryInstitution": {
+      "senderABANumber": "021052590",
+      "senderShortName": "CITIBANK"
+    },
+    "receiverDepositoryInstitution": {
+      "receiverABANumber": "321177573",
+      "receiverShortName": "CITIBANK"
+    },
+    "originator": {
+      "personal": {
+        "name": "BANK OF AMERICA",
+        "address": {
+          "addressLineOne": "Street Name Building Number",
+          "addressLineTwo": "Flr Floor, Room",
+          "addressLineThree": "Town Name, Sub Division Post Code, US"
+        },
+        "identifier": ""
+      }
+    },
+    "beneficiary": {
+      "personal": {
+        "name": "CITIBANK",
+        "address": {
+          "addressLineOne": "Street Name Building Number",
+          "addressLineTwo": "Flr Floor, Room",
+          "addressLineThree": "Town Name, Sub Division Post Code, US"
+        },
+        "identifier": ""
+      }
+    }
+  }
+}

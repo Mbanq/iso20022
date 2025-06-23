@@ -11,13 +11,19 @@ class PstlAdr:
     """Postal address information."""
     StrtNm: Optional[str] = None
     BldgNb: Optional[str] = None
+    BldgNm: Optional[str] = None  # Added to handle Building Name field
     Flr: Optional[str] = None
     Room: Optional[str] = None
     PstCd: Optional[str] = None
+    PstBx: Optional[str] = None  # Added to handle PostBox field
     TwnNm: Optional[str] = None
+    TwnLctnNm: Optional[str] = None  # Added to handle Town Location Name field
+    DstrctNm: Optional[str] = None  # Added to handle District Name field
     CtrySubDvsn: Optional[str] = None
     Ctry: Optional[str] = None
     AdrLine: Optional[List[str]] = None
+    Dept: Optional[str] = None  # Added to handle Department field
+    SubDept: Optional[str] = None  # Added to handle SubDepartment field
 
 
 @dataclass

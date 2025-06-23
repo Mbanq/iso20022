@@ -4,7 +4,7 @@ from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from random import choices
 from string import ascii_letters, digits
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from iso20022gen.models.common import *
@@ -22,11 +22,11 @@ class CdtTrfTxInf:
     InstgAgt: InstgAgt
     InstdAgt: InstdAgt
     Dbtr: Dbtr
-    DbtrAcct: DbtrAcct
     DbtrAgt: DbtrAgt
     CdtrAgt: CdtrAgt
     Cdtr: Cdtr
-    CdtrAcct: CdtrAcct
+    DbtrAcct: Optional[DbtrAcct] = None  # Made optional
+    CdtrAcct: Optional[CdtrAcct] = None  # Made optional
 
 
     @staticmethod
@@ -58,23 +58,31 @@ class FIToFICstmrCdtTrf:
         # 1. Extract CdtTrfTxInf data
         cdt_trf_tx_inf_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['Document']['FIToFICstmrCdtTrf']['CdtTrfTxInf']
 
-        # 2. Instantiate the CdtTrfTxInf data class
-        cdt_trf_tx_inf = CdtTrfTxInf(
-            PmtId=PmtId(**cdt_trf_tx_inf_data['PmtId']),
-            PmtTpInf=PmtTpInf(LclInstrm=LclInstrm(**cdt_trf_tx_inf_data['PmtTpInf']['LclInstrm'])),
-            IntrBkSttlmAmt=cdt_trf_tx_inf_data['IntrBkSttlmAmt'],
-            IntrBkSttlmDt=cdt_trf_tx_inf_data['IntrBkSttlmDt'],
-            InstdAmt=cdt_trf_tx_inf_data['InstdAmt'],
-            ChrgBr=cdt_trf_tx_inf_data['ChrgBr'],
-            InstgAgt=InstgAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstgAgt']['FinInstnId'])),
-            InstdAgt=InstdAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstdAgt']['FinInstnId'])),
-            Dbtr=Dbtr(Nm=cdt_trf_tx_inf_data['Dbtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Dbtr']['PstlAdr'])),
-            DbtrAcct=DbtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['DbtrAcct']['Id']['Othr']))),
-            DbtrAgt=DbtrAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['DbtrAgt']['FinInstnId'])),
-            CdtrAgt=CdtrAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['CdtrAgt']['FinInstnId'])),
-            Cdtr=Cdtr(Nm=cdt_trf_tx_inf_data['Cdtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Cdtr']['PstlAdr'])),
-            CdtrAcct=CdtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['CdtrAcct']['Id']['Othr'])))
-        )
+        # 2. Instantiate the CdtTrfTxInf data class with optional DbtrAcct and CdtrAcct
+        cdt_trf_tx_inf_data = {
+            'PmtId': PmtId(**cdt_trf_tx_inf_data['PmtId']),
+            'PmtTpInf': PmtTpInf(LclInstrm=LclInstrm(**cdt_trf_tx_inf_data['PmtTpInf']['LclInstrm'])),
+            'IntrBkSttlmAmt': cdt_trf_tx_inf_data['IntrBkSttlmAmt'],
+            'IntrBkSttlmDt': cdt_trf_tx_inf_data['IntrBkSttlmDt'],
+            'InstdAmt': cdt_trf_tx_inf_data['InstdAmt'],
+            'ChrgBr': cdt_trf_tx_inf_data['ChrgBr'],
+            'InstgAgt': InstgAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstgAgt']['FinInstnId'])),
+            'InstdAgt': InstdAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstdAgt']['FinInstnId'])),
+            'Dbtr': Dbtr(Nm=cdt_trf_tx_inf_data['Dbtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Dbtr']['PstlAdr'])),
+            'DbtrAgt': DbtrAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['DbtrAgt']['FinInstnId'])),
+            'CdtrAgt': CdtrAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['CdtrAgt']['FinInstnId'])),
+            'Cdtr': Cdtr(Nm=cdt_trf_tx_inf_data['Cdtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Cdtr']['PstlAdr']))
+        }
+        
+        # Add DbtrAcct if present in the input data
+        if 'DbtrAcct' in cdt_trf_tx_inf_data and 'Id' in cdt_trf_tx_inf_data['DbtrAcct'] and 'Othr' in cdt_trf_tx_inf_data['DbtrAcct']['Id']:
+            cdt_trf_tx_inf_data['DbtrAcct'] = DbtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['DbtrAcct']['Id']['Othr'])))
+            
+        # Add CdtrAcct if present in the input data
+        if 'CdtrAcct' in cdt_trf_tx_inf_data and 'Id' in cdt_trf_tx_inf_data['CdtrAcct'] and 'Othr' in cdt_trf_tx_inf_data['CdtrAcct']['Id']:
+            cdt_trf_tx_inf_data['CdtrAcct'] = CdtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['CdtrAcct']['Id']['Othr'])))
+        
+        cdt_trf_tx_inf = CdtTrfTxInf(**cdt_trf_tx_inf_data)
 
         return cdt_trf_tx_inf
 
