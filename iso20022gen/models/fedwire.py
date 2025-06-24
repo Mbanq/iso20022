@@ -157,7 +157,7 @@ def generate_message_structure(app_hdr_xml, document_xml, name, target_ns, root_
     
     return complete_structure
 
-def generate_fedwire_message(message_code: str, payload: Dict[str, Any], xsd_path: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+def generate_fedwire_message(message_code: str, fed_aba: str, payload: Dict[str, Any], xsd_path: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
     Generate a complete ISO20022 message using the models from iso20022gen.
     
@@ -174,7 +174,7 @@ def generate_fedwire_message(message_code: str, payload: Dict[str, Any], xsd_pat
     
     try:
         # Generate AppHdr
-        app_hdr = AppHdr.from_payload(payload)
+        app_hdr = AppHdr.from_payload(fed_aba, payload)
         app_hdr_dict = app_hdr.to_dict()
         app_hdr_xml = dict_to_xml(app_hdr_dict, "head", "urn:iso:std:iso:20022:tech:xsd:head.001.001.03")
         
@@ -239,6 +239,22 @@ def generate_fedwire_message(message_code: str, payload: Dict[str, Any], xsd_pat
         print(f"Error generating message: {e}")
         return None, None, None
 
+def get_account_number(Acct):
+
+    print(Acct)
+    """Safely retrieves the account number from an Acct object."""
+    if not Acct or not hasattr(Acct, 'Id') or not Acct.Id:
+        return ""
+    # Prioritize Other ID if available
+    if hasattr(Acct.Id.Othr, 'Id') and Acct.Id.Othr.Id:
+        return Acct.Id.Othr.Id
+
+    # Fallback to IBAN
+    if hasattr(Acct.Id, 'IBAN') and Acct.Id.IBAN:
+        return Acct.Id.IBAN
+
+    return ""
+
 def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf):
     """Maps AppHdr and CdtTrfTxInf data classes to the Fedwire JSON format. Supports PACS008 Only"""
 
@@ -301,7 +317,7 @@ def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf):
                         "addressLineTwo": get_adr_line(cdt_trf_tx_inf.Dbtr.PstlAdr, 1),
                         "addressLineThree": get_adr_line(cdt_trf_tx_inf.Dbtr.PstlAdr, 2)
                     },
-                    "identifier": cdt_trf_tx_inf.DbtrAcct.Id.Othr.Id if cdt_trf_tx_inf.DbtrAcct and hasattr(cdt_trf_tx_inf.DbtrAcct, 'Id') and hasattr(cdt_trf_tx_inf.DbtrAcct.Id, 'Othr') and hasattr(cdt_trf_tx_inf.DbtrAcct.Id.Othr, 'Id') else ""
+                    "identifier": get_account_number(cdt_trf_tx_inf.DbtrAcct)
                 }
             },
             "beneficiary": {
@@ -312,7 +328,7 @@ def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf):
                         "addressLineTwo": get_adr_line(cdt_trf_tx_inf.Cdtr.PstlAdr, 1),
                         "addressLineThree": get_adr_line(cdt_trf_tx_inf.Cdtr.PstlAdr, 2)
                     },
-                    "identifier": cdt_trf_tx_inf.CdtrAcct.Id.Othr.Id if cdt_trf_tx_inf.CdtrAcct and hasattr(cdt_trf_tx_inf.CdtrAcct, 'Id') and hasattr(cdt_trf_tx_inf.CdtrAcct.Id, 'Othr') and hasattr(cdt_trf_tx_inf.CdtrAcct.Id.Othr, 'Id') else ""
+                    "identifier": get_account_number(cdt_trf_tx_inf.CdtrAcct)
                 }
             }
         }
@@ -346,7 +362,6 @@ def generate_fedwire_payload(xml_file, message_code):
     # 1. Parse the XML file to JSON
     json_output = parse_xml_to_json(xml_file)
     data = json.loads(json_output)
-    print(message_code)
 
     # 2. Instantiate the AppHdr & CdtTrfTxInf data class
     
