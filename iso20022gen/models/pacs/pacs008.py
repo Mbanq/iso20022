@@ -25,8 +25,8 @@ class CdtTrfTxInf:
     DbtrAgt: DbtrAgt
     CdtrAgt: CdtrAgt
     Cdtr: Cdtr
-    DbtrAcct: Optional[DbtrAcct] = None  # Made optional
-    CdtrAcct: Optional[CdtrAcct] = None  # Made optional
+    DbtrAcct: Optional[DbtrAcct] = None 
+    CdtrAcct: Optional[CdtrAcct] = None  
 
 
     @staticmethod
@@ -59,7 +59,7 @@ class FIToFICstmrCdtTrf:
         cdt_trf_tx_inf_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['Document']['FIToFICstmrCdtTrf']['CdtTrfTxInf']
 
         # 2. Instantiate the CdtTrfTxInf data class with optional DbtrAcct and CdtrAcct
-        cdt_trf_tx_inf_data = {
+        cdt_trf_tx_inf = {
             'PmtId': PmtId(**cdt_trf_tx_inf_data['PmtId']),
             'PmtTpInf': PmtTpInf(LclInstrm=LclInstrm(**cdt_trf_tx_inf_data['PmtTpInf']['LclInstrm'])),
             'IntrBkSttlmAmt': cdt_trf_tx_inf_data['IntrBkSttlmAmt'],
@@ -76,13 +76,13 @@ class FIToFICstmrCdtTrf:
         
         # Add DbtrAcct if present in the input data
         if 'DbtrAcct' in cdt_trf_tx_inf_data and 'Id' in cdt_trf_tx_inf_data['DbtrAcct'] and 'Othr' in cdt_trf_tx_inf_data['DbtrAcct']['Id']:
-            cdt_trf_tx_inf_data['DbtrAcct'] = DbtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['DbtrAcct']['Id']['Othr'])))
+            cdt_trf_tx_inf['DbtrAcct'] = DbtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['DbtrAcct']['Id']['Othr'])))
             
         # Add CdtrAcct if present in the input data
         if 'CdtrAcct' in cdt_trf_tx_inf_data and 'Id' in cdt_trf_tx_inf_data['CdtrAcct'] and 'Othr' in cdt_trf_tx_inf_data['CdtrAcct']['Id']:
-            cdt_trf_tx_inf_data['CdtrAcct'] = CdtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['CdtrAcct']['Id']['Othr'])))
+            cdt_trf_tx_inf['CdtrAcct'] = CdtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['CdtrAcct']['Id']['Othr'])))
         
-        cdt_trf_tx_inf = CdtTrfTxInf(**cdt_trf_tx_inf_data)
+        cdt_trf_tx_inf = CdtTrfTxInf(**cdt_trf_tx_inf)
 
         return cdt_trf_tx_inf
 
