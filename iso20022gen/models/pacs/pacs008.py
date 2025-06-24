@@ -13,21 +13,30 @@ from iso20022gen.models.common import *
 @dataclass
 class CdtTrfTxInf:
     """Credit transfer transaction information."""
-    PmtId: PmtId
-    PmtTpInf: PmtTpInf
-    IntrBkSttlmAmt: Dict[str, Any]
-    IntrBkSttlmDt: str
-    InstdAmt: Dict[str, Any]
-    ChrgBr: str
-    InstgAgt: InstgAgt
-    InstdAgt: InstdAgt
-    Dbtr: Dbtr
-    DbtrAgt: DbtrAgt
-    CdtrAgt: CdtrAgt
-    Cdtr: Cdtr
-    DbtrAcct: Optional[DbtrAcct] = None 
-    CdtrAcct: Optional[CdtrAcct] = None  
+    PmtId: Optional[PmtId] = None
+    PmtTpInf: Optional[PmtTpInf] = None
+    IntrBkSttlmAmt: Optional[Dict[str, Any]] = None
+    IntrBkSttlmDt: Optional[str] = None
+    InstdAmt: Optional[Dict[str, Any]] = None
+    ChrgBr: Optional[str] = None
+    InstgAgt: Optional[InstgAgt] = None
+    InstdAgt: Optional[InstdAgt] = None
+    Dbtr: Optional[Dbtr] = None
+    DbtrAcct: Optional[DbtrAcct] = None
+    DbtrAgt: Optional[DbtrAgt] = None
+    CdtrAgt: Optional[CdtrAgt] = None
+    Cdtr: Optional[Cdtr] = None
+    CdtrAcct: Optional[CdtrAcct] = None
 
+    def __post_init__(self):
+        """Validate that required fields are not None."""
+        required_fields = [
+            'PmtId', 'PmtTpInf', 'IntrBkSttlmAmt', 'IntrBkSttlmDt', 'InstdAmt',
+            'ChrgBr', 'InstgAgt', 'InstdAgt', 'Dbtr', 'DbtrAgt', 'CdtrAgt', 'Cdtr'
+        ]
+        for field_name in required_fields:
+            if getattr(self, field_name) is None:
+                raise ValueError(f"Field '{field_name}' is required for CdtTrfTxInf but was not provided.")
 
     @staticmethod
     def build_fin_instn_id(data):
@@ -69,18 +78,12 @@ class FIToFICstmrCdtTrf:
             'InstgAgt': InstgAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstgAgt']['FinInstnId'])),
             'InstdAgt': InstdAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstdAgt']['FinInstnId'])),
             'Dbtr': Dbtr(Nm=cdt_trf_tx_inf_data['Dbtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Dbtr']['PstlAdr'])),
+            'DbtrAcct': DbtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['DbtrAcct']['Id']['Othr']))) if 'DbtrAcct' in cdt_trf_tx_inf_data and 'Id' in cdt_trf_tx_inf_data['DbtrAcct'] and 'Othr' in cdt_trf_tx_inf_data['DbtrAcct']['Id'] else None,
             'DbtrAgt': DbtrAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['DbtrAgt']['FinInstnId'])),
             'CdtrAgt': CdtrAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['CdtrAgt']['FinInstnId'])),
-            'Cdtr': Cdtr(Nm=cdt_trf_tx_inf_data['Cdtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Cdtr']['PstlAdr']))
+            'Cdtr': Cdtr(Nm=cdt_trf_tx_inf_data['Cdtr']['Nm'], PstlAdr=PstlAdr(**cdt_trf_tx_inf_data['Cdtr']['PstlAdr'])),
+            'CdtrAcct': CdtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['CdtrAcct']['Id']['Othr']))) if 'CdtrAcct' in cdt_trf_tx_inf_data and 'Id' in cdt_trf_tx_inf_data['CdtrAcct'] and 'Othr' in cdt_trf_tx_inf_data['CdtrAcct']['Id'] else None,
         }
-        
-        # Add DbtrAcct if present in the input data
-        if 'DbtrAcct' in cdt_trf_tx_inf_data and 'Id' in cdt_trf_tx_inf_data['DbtrAcct'] and 'Othr' in cdt_trf_tx_inf_data['DbtrAcct']['Id']:
-            cdt_trf_tx_inf['DbtrAcct'] = DbtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['DbtrAcct']['Id']['Othr'])))
-            
-        # Add CdtrAcct if present in the input data
-        if 'CdtrAcct' in cdt_trf_tx_inf_data and 'Id' in cdt_trf_tx_inf_data['CdtrAcct'] and 'Othr' in cdt_trf_tx_inf_data['CdtrAcct']['Id']:
-            cdt_trf_tx_inf['CdtrAcct'] = CdtrAcct(Id=IdAcct(Othr=Othr(**cdt_trf_tx_inf_data['CdtrAcct']['Id']['Othr'])))
         
         cdt_trf_tx_inf = CdtTrfTxInf(**cdt_trf_tx_inf)
 
