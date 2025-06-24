@@ -80,6 +80,7 @@ def main():
     parser = argparse.ArgumentParser(description='ISO20022 Message Structure Identifier')
     parser.add_argument('message_code', nargs='?', help='ISO20022 message code (e.g., urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08)')
     parser.add_argument('--generate', action='store_true', help='Generate a complete message using models')
+    parser.add_argument('--fed-aba', help='The Fed ABA number for message generation')
     parser.add_argument('--sample-file', help='Path to sample JSON payload file for message generation')
     parser.add_argument('--output-file', help='Path to output XML file for the generated message')
     parser.add_argument('--xsd-file', default='proprietary_xsd/fedwirefunds-incoming.xsd', help='Path to the XSD file')
@@ -119,7 +120,7 @@ def main():
         payload = load_sample_payload(sample_path)
         
         # Generate the complete message
-        _, _, complete_message = generate_fedwire_message(args.message_code, payload, xsd_path)
+        _, _, complete_message = generate_fedwire_message(args.message_code, args.fed_aba, payload, xsd_path)
         
         if complete_message:
             print("Complete Message Structure:")
@@ -171,7 +172,7 @@ def main():
             sample_payload = load_sample_payload(sample_file_path)
             
             # Generate the message structure
-            app_hdr_xml, document_xml, structure = generate_fedwire_message(args.message_code, sample_payload, xsd_path)
+            app_hdr_xml, document_xml, structure = generate_fedwire_message(args.message_code, args.fed_aba, sample_payload, xsd_path)
             if structure:
                 print("Message Structure:")
                 print(structure)
