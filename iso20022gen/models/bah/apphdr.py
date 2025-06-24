@@ -56,6 +56,7 @@ class AppHdr:
     @classmethod
     def from_payload(
             cls,
+            fed_aba,
             payload: Dict[str, Any]
     ) -> "AppHdr":
         fedwire_message = payload["fedWireMessage"]
@@ -67,7 +68,7 @@ class AppHdr:
         )
 
         sender_aba = fedwire_message["senderDepositoryInstitution"]["senderABANumber"]
-        receiver_aba = fedwire_message["receiverDepositoryInstitution"]["receiverABANumber"]
+        receiver_aba = fed_aba
 
         return cls(
             Fr=Fr(
