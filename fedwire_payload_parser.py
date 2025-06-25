@@ -6,7 +6,7 @@ import argparse
 # Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 
-from iso20022gen.models.fedwire import generate_fedwire_payload
+from dough.iso20022.fedwire import generate_fedwire_payload
 
 def main():
     parser = argparse.ArgumentParser(description="Parse ISO20022 XML and convert to Fedwire JSON format.")

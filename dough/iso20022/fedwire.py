@@ -6,13 +6,13 @@ from typing import Dict, Any, Tuple, Optional, List, Union
 from datetime import datetime
 
 # Fix imports to use the correct package structure
-from iso20022gen.models.bah.apphdr import AppHdr
-from iso20022gen.models.pacs.pacs008 import Document as Pacs008Document 
-from iso20022gen.models.pacs.pacs028 import Document as Pacs028Document
-from iso20022gen.models.pacs.pacs002 import FIToFIPmtStsRpt
-from iso20022gen.models.pacs.pacs008 import FIToFICstmrCdtTrf
-from iso20022gen.models.helpers import dict_to_xml
-from iso20022gen.models.helpers import parse_xml_to_json
+from dough.iso20022.bah.apphdr import AppHdr
+from dough.iso20022.pacs.pacs008 import Document as Pacs008Document 
+from dough.iso20022.pacs.pacs028 import Document as Pacs028Document
+from dough.iso20022.pacs.pacs002 import FIToFIPmtStsRpt
+from dough.iso20022.pacs.pacs008 import FIToFICstmrCdtTrf
+from dough.iso20022.helpers import dict_to_xml
+from dough.iso20022.helpers import parse_xml_to_json
 
 def parse_message_envelope(xsd_path, message_code):
     """
@@ -159,7 +159,7 @@ def generate_message_structure(app_hdr_xml, document_xml, name, target_ns, root_
 
 def generate_fedwire_message(message_code: str, fed_aba: str, payload: Dict[str, Any], xsd_path: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
-    Generate a complete ISO20022 message using the models from iso20022gen.
+    Generate a complete ISO20022 message using the models from dough.
     
     Args:
         message_code: The ISO20022 message code (e.g., urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08)

@@ -7,7 +7,7 @@ from string import ascii_letters, digits
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
-from iso20022gen.models.common import *
+from dough.iso20022.common import *
 
 
 @dataclass

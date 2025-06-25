@@ -90,9 +90,9 @@ if __name__ == "__main__":
         xml_file = "output.xml"
     
     # Define XSD schemas
-    apphdr_xsd = "iso20022gen/schemas/head.001.001.03.xsd"
-    pacs008_xsd = "iso20022gen/schemas/pacs.008.001.08.xsd"
-    pacs028_xsd = "iso20022gen/schemas/pacs.028.001.03.xsd"
+    apphdr_xsd = "dough/schemas/head.001.001.03.xsd"
+    pacs008_xsd = "dough/schemas/pacs.008.001.08.xsd"
+    pacs028_xsd = "dough/schemas/pacs.028.001.03.xsd"
     
     # Detect message type
     message_type = detect_message_type(xml_file)
