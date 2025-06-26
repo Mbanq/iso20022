@@ -89,7 +89,7 @@ def main():
     gen_parser.add_argument('--fed-aba', required=True, help='The Fed ABA number for message generation.')
     gen_parser.add_argument('--input-file', required=True, help='Path to input JSON payload file.')
     gen_parser.add_argument('--output-file', help='Path to output XML file.')
-    gen_parser.add_argument('--xsd-file', default='proprietary_xsd/fedwirefunds-incoming.xsd', help='Path to the XSD file.')
+    gen_parser.add_argument('--xsd-file', required=True, help='Path to the XSD file.')
     gen_parser.set_defaults(func=handle_generate)
 
     # Parse command
