@@ -17,7 +17,7 @@ from werkzeug.utils import secure_filename
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import the fedwire module functions
-from dough.iso20022.fedwire import generate_fedwire_message
+from mb_iso20022.fedwire import generate_fedwire_message
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = tempfile.mkdtemp()

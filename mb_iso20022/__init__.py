@@ -3,9 +3,9 @@ ISO 20022 data models package.
 """
 
 from dataclasses import asdict
-from dough.iso20022.bah.apphdr import AppHdr
-from dough.iso20022.pacs import Document, FIToFICstmrCdtTrf
-from dough.iso20022.helpers import dict_to_xml
+from mb_iso20022.bah.apphdr import AppHdr
+from mb_iso20022.pacs import Document, FIToFICstmrCdtTrf
+from mb_iso20022.helpers import dict_to_xml
 
 def model_to_xml(model, prefix=None, namespace=None):
     """Convert model to XML using the dictionary-based approach."""

@@ -52,7 +52,7 @@ You can also use the library programmatically in your Python code:
 
 ```python
 import json
-from dough.iso20022.fedwire import generate_fedwire_message
+from mb_iso20022.fedwire import generate_fedwire_message
 
 # Load your payment data
 with open("sample_files/sample_payload.json", "r") as f:
