@@ -73,9 +73,15 @@ class FIToFICstmrCdtTrf:
         cdt_trf_tx_inf = {
             'PmtId': PmtId(**cdt_trf_tx_inf_data['PmtId']),
             'PmtTpInf': PmtTpInf(LclInstrm=LclInstrm(**cdt_trf_tx_inf_data['PmtTpInf']['LclInstrm'])),
-            'IntrBkSttlmAmt': cdt_trf_tx_inf_data['IntrBkSttlmAmt'],
+            'IntrBkSttlmAmt': {
+                '@Ccy': cdt_trf_tx_inf_data['IntrBkSttlmAmt']['@attributes']['Ccy'],
+                '#text': str(cdt_trf_tx_inf_data['IntrBkSttlmAmt']['#text']).replace('.', '')
+            },
             'IntrBkSttlmDt': cdt_trf_tx_inf_data['IntrBkSttlmDt'],
-            'InstdAmt': cdt_trf_tx_inf_data['InstdAmt'],
+            'InstdAmt': {
+                '@Ccy': cdt_trf_tx_inf_data['InstdAmt']['@attributes']['Ccy'],
+                '#text': str(cdt_trf_tx_inf_data['InstdAmt']['#text']).replace('.', '')
+            },
             'ChrgBr': cdt_trf_tx_inf_data['ChrgBr'],
             'InstgAgt': InstgAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstgAgt']['FinInstnId'])),
             'InstdAgt': InstdAgt(FinInstnId=CdtTrfTxInf.build_fin_instn_id(cdt_trf_tx_inf_data['InstdAgt']['FinInstnId'])),
