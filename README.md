@@ -38,59 +38,62 @@ This project offers three primary ways to interact with ISO 20022 messages: the 
 
 ### 1. Command-Line Interface (CLI)
 
-The CLI provides two main scripts: `fedwire_message_generator.py` for creating messages and `fedwire_payload_parser.py` for parsing them.
+The CLI provides a single entry point, `miso20022`, with two main commands: `generate` for creating messages and `parse` for parsing them.
 
-#### Message Generation (`fedwire_message_generator.py`)
+#### Message Generation (`generate`)
 
-This script generates a complete ISO 20022 message from a JSON payload.
+This command generates a complete ISO 20022 message from a JSON payload.
 
 **Usage:**
 
 ```bash
-python3 fedwire_message_generator.py --generate --sample-file [PAYLOAD_FILE] --output-file [OUTPUT_XML] --fed-aba [ABA_NUMBER] [MESSAGE_CODE]
+miso20022 generate --message_code [MESSAGE_CODE] --fed-aba [ABA_NUMBER] --input-file [PAYLOAD_FILE] --output-file [OUTPUT_XML]
 ```
 
 **Arguments:**
 
--   `--generate`: Flag to indicate that a message should be generated.
--   `--sample-file`: Path to the input JSON payload file.
--   `--output-file`: Path to save the generated XML message.
+-   `--message_code`: The ISO 20022 message code (e.g., `urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08`).
 -   `--fed-aba`: The Fedwire ABA number.
--   `MESSAGE_CODE`: The ISO 20022 message code (e.g., `urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08`).
+-   `--input-file`: Path to the input JSON payload file.
+-   `--output-file`: (Optional) Path to save the generated XML message. If not provided, a filename will be generated automatically.
+-   `--xsd-file`: Path to the XSD file for validation. Defaults to `proprietary_Fed_Format.xsd`.
 
 **Example:**
 
 ```bash
-python3 fedwire_message_generator.py \
-    --generate \
-    --sample-file sample_files/sample_payload.json \
-    --output-file pacs.008_output.xml \
+miso20022 generate \
+    --message_code urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 \
     --fed-aba 021151080 \
-    urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08
+    --input-file sample_files/sample_payment.json \
+    --output-file pacs.008_output.xml
 ```
 
-#### Payload Parser (`fedwire_payload_parser.py`)
+#### Payload Parser (`parse`)
 
-This script parses an existing ISO 20022 XML file and converts it into a JSON payload.
+This command parses an existing ISO 20022 XML file and converts it into a JSON payload.
 
 **Usage:**
 
 ```bash
-python3 fedwire_payload_parser.py [INPUT_XML] [MESSAGE_CODE]
+miso20022 parse --input-file [INPUT_XML] --message-code [MESSAGE_CODE] --output-file [OUTPUT_JSON]
 ```
 
 **Arguments:**
 
--   `INPUT_XML`: Path to the input ISO 20022 XML file.
--   `MESSAGE_CODE`: The ISO 20022 message code of the input file.
+-   `--input-file`: Path to the input ISO 20022 XML file.
+-   `--message-code`: The ISO 20022 message code of the input file.
+-   `--output-file`: (Optional) Path to save the output JSON payload. If not provided, a filename will be generated automatically.
 
 **Example:**
 
 ```bash
-python3 fedwire_payload_parser.py sample_files/pacs.008.001.008_2025_1.xml pacs.008.001.08
+miso20022 parse \
+    --input-file sample_files/pacs.008.001.008_2025_1.xml \
+    --message-code urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 \
+    --output-file parsed_payload.json
 ```
 
-This will create a `pacs.008.001.008_2025_1_output.json` file in the same directory.
+This will create a `parsed_payload.json` file in the current directory.
 
 ### 2. Web Application
 
@@ -161,3 +164,7 @@ Support for other message types can be added by extending the data models in the
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any bugs, feature requests, or improvements.
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
