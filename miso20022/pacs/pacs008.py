@@ -1,4 +1,4 @@
-# pacs008.py
+# SPDX-License-Identifier: Apache-2.0
 
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
@@ -66,8 +66,10 @@ class FIToFICstmrCdtTrf:
 
         # 1. Extract CdtTrfTxInf data
         cdt_trf_tx_inf_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['Document']['FIToFICstmrCdtTrf']['CdtTrfTxInf']
+        grp_hdr_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['Document']['FIToFICstmrCdtTrf']['GrpHdr']
 
         # 2. Instantiate the CdtTrfTxInf data class with optional DbtrAcct and CdtrAcct
+        grp_hdr_data = GrpHdr(**grp_hdr_data)
         cdt_trf_tx_inf = {
             'PmtId': PmtId(**cdt_trf_tx_inf_data['PmtId']),
             'PmtTpInf': PmtTpInf(LclInstrm=LclInstrm(**cdt_trf_tx_inf_data['PmtTpInf']['LclInstrm'])),
@@ -87,7 +89,7 @@ class FIToFICstmrCdtTrf:
         
         cdt_trf_tx_inf = CdtTrfTxInf(**cdt_trf_tx_inf)
 
-        return cdt_trf_tx_inf
+        return grp_hdr_data, cdt_trf_tx_inf
 
 
 @dataclass
@@ -131,7 +133,9 @@ class Document:
             for key in ("addressLineOne", "addressLineTwo", "addressLineThree"):
                 val = personal["address"].get(key, "").replace("NA", "").strip()
                 if val:
-                    lines.append(val[:35])
+                    if len(val) > 32:
+                        raise ValueError(f"Address line '{key}' ('{val}') exceeds 32 characters.")
+                    lines.append(val)
             return lines
 
         # Build all submodels
