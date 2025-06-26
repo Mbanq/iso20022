@@ -240,8 +240,6 @@ def generate_fedwire_message(message_code: str, fed_aba: str, payload: Dict[str,
         return None, None, None
 
 def get_account_number(Acct):
-
-    print(Acct)
     """Safely retrieves the account number from an Acct object."""
     if not Acct or not hasattr(Acct, 'Id') or not Acct.Id:
         return ""
@@ -365,7 +363,7 @@ def generate_fedwire_payload(xml_file, message_code):
 
     # 2. Instantiate the AppHdr & CdtTrfTxInf data class
     
-    if message_code == "pacs.008.001.08":
+    if message_code == "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08":
 
         app_hdr_instance = AppHdr.from_iso20022(data,message_code)
         cdt_trf_tx_inf= FIToFICstmrCdtTrf.from_iso20022(data)
@@ -373,7 +371,7 @@ def generate_fedwire_payload(xml_file, message_code):
         # 3. Map to Fedwire JSON format
         fedwire_json = pacs_008_to_fedwire_json(app_hdr_instance, cdt_trf_tx_inf)
 
-    elif message_code == "pacs.002.001.10":
+    elif message_code == "urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10":
 
         app_hdr_instance = AppHdr.from_iso20022(data,message_code)
         pmt_sts_req= FIToFIPmtStsRpt.from_iso20022(data)

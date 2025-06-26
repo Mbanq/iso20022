@@ -99,9 +99,9 @@ class AppHdr:
     def from_iso20022(cls, data: Dict[str, Any],message_code)-> "AppHdr":
 
         # 1. Extract AppHdr data
-        if message_code == "pacs.008.001.08":
+        if message_code == "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08":
             app_hdr_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsCustomerCreditTransfer']['AppHdr']
-        elif message_code == "pacs.002.001.10":
+        elif message_code == "urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10":
             app_hdr_data = data['FedwireFundsOutgoing']['FedwireFundsOutgoingMessage']['FedwireFundsPaymentStatus']['AppHdr']
 
         # 2. Instantiate the AppHdr data class
