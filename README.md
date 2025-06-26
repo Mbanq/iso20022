@@ -144,26 +144,39 @@ Support for other message types can be added by extending the data models in the
 
 ```
 .
-├── fedwire_message_generator.py  # CLI for generating messages
-├── fedwire_payload_parser.py     # CLI for parsing messages
-├── miso20022/                  # Core Python library
+
+├── LICENSE
+├── README.md
+├── miso20022/
+│   ├── README.md
 │   ├── __init__.py
-│   ├── bah/                      # Business Application Header models
-│   ├── common/                   # Common data models
-│   ├── pacs/                     # Payments Clearing and Settlement models
-│   └── ...
-├── schemas/                      # XSD schema files
-├── sample_files/                 # Sample XML and JSON files
-├── webapp/                       # Flask web application
-│   ├── app.py
-│   └── templates/
-│       └── index.html
-└── README.md
+│   ├── bah/ # Contains the bah message models
+│   ├── cli.py # Contains the command line interface
+│   ├── fedwire.py # Contains the fedwire message generator
+│   ├── helpers.py # Contains the helper functions
+│   └── pacs/ # Contains the pacs message models
+├── pyproject.toml # Contains the project metadata
+├── webapp # Contains the web application
+├── validate_xml.py # Contains the xml validator
+└── venv/ # Contains the virtual environment
 ```
+
+### Important Notice on Proprietary Envelope
+The Fedwire envelope format is proprietary and must be implemented according to the Federal Reserve specifications. This library only generates the ISO 20022 message content and wraps them in the message envelope only if the propietory XSD is provided.
+
+For Fedwire: 
+
+[Get Access to Prorietory XSD](https://www.frbservices.org/binaries/content/assets/crsocms/resources/financial-services/request-access-fedwire-funds-iso-20022-technical-guide.pdf)
+
+For official information about Fedwire ISO 20022 implementation, including envelope specifications, please consult the following resources:
+
+- [Federal Reserve ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center)
+- [Federal Reserve's MyStandards platform](https://www2.swift.com/mystandards/#/group/Federal_Reserve_Financial_Services/Fedwire_Funds_Service)
+- [The Fedwire Funds Service ISO 20022 Implementation Guide and Technical Guide](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center)
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a pull request or open an issue for any bugs, feature requests, or improvements.
+Contributions are welcome! Please feel free to open an issue for any bugs, feature requests, or improvements.
 
 ## License
 
