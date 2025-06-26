@@ -1,8 +1,7 @@
-# MB-ISO20022 Python Library
+# MISO20022 Python Library
 
-This package provides a set of tools for generating and working with ISO 20022 financial messages, with a special focus on the Fedwire Funds Service.
+This package provides a set of tools for generating and working with ISO 20022 financial messages, with a focus on the US Payment Rails.
 
-This library is the core component of the larger [ISO20022 Message Generator and Parser project](https://github.com/your-username/iso20022). For command-line tools and a web-based interface, please refer to the main project repository.
 
 ## Installation
 
@@ -42,7 +41,7 @@ fed_aba = '000000008' # The ABA number for the Fed
 xsd_path = 'proprietary_fed_file.xsd' # The XSD file for fedwire format
 
 # 3. Generate the complete XML message
-xml_message = generate_fedwire_message(
+_, _, complete_message = generate_fedwire_message(
     message_code=message_code,
     payload=payload,
     fed_aba=fed_aba,
@@ -50,8 +49,9 @@ xml_message = generate_fedwire_message(
 )
 
 # 4. Save the message to a file
-with open('generated_pacs.008.xml', 'w') as f:
-    f.write(xml_message)
+if complete_message:
+    with open('generated_pacs.008.xml', 'w') as f:
+        f.write(complete_message)
 
 print("pacs.008.001.08 message generated successfully!")
 ```
@@ -74,7 +74,7 @@ fed_aba = '000000008'
 xsd_path = 'proprietary_fed_file.xsd'
 
 # 3. Generate the XML message
-xml_message = generate_fedwire_message(
+_, _, complete_message = generate_fedwire_message(
     message_code=message_code,
     payload=payload,
     fed_aba=fed_aba,
@@ -82,8 +82,9 @@ xml_message = generate_fedwire_message(
 )
 
 # 4. Save the message to a file
-with open('generated_pacs.028.xml', 'w') as f:
-    f.write(xml_message)
+if complete_message:
+    with open('generated_pacs.028.xml', 'w') as f:
+        f.write(complete_message)
 
 print("pacs.028.001.03 message generated successfully!")
 ```
@@ -97,15 +98,16 @@ from miso20022.fedwire import generate_fedwire_payload
 import json
 
 # 1. Define the path to your XML file and the message code
-xml_file = 'sample_files/pacs.008.001.008_2025_1.xml'
-message_code = 'pacs.008.001.08'
+xml_file = 'incoming_pacs.008.xml'
+message_code = 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08'
 
-# 2. Parse the XML to get the JSON payload
-payload_dict = generate_fedwire_payload(xml_file, message_code)
+# 2. Parse the XML file
+fedwire_json = generate_fedwire_payload(xml_file, message_code)
 
-# 3. Save the payload to a JSON file
-with open('parsed_pacs.008_payload.json', 'w') as f:
-    json.dump(payload_dict, f, indent=4)
+# 3. Save the JSON payload to a file
+if fedwire_json:
+    with open('parsed_pacs.008.json', 'w') as f:
+        json.dump(fedwire_json, f, indent=4)
 
 print("pacs.008.001.08 XML parsed to JSON successfully!")
 ```
@@ -120,17 +122,73 @@ import json
 
 # 1. Define the path to your XML file and the message code
 xml_file = 'sample_files/pacs.002_PaymentAck.xml'
-message_code = 'pacs.002.001.10'
+message_code = 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10'
 
 # 2. Parse the XML to get the JSON payload
-payload_dict = generate_fedwire_payload(xml_file, message_code)
+fedwire_json = generate_fedwire_payload(xml_file, message_code)
 
 # 3. Save the payload to a JSON file
-with open('parsed_pacs.002_payload.json', 'w') as f:
-    json.dump(payload_dict, f, indent=4)
+if fedwire_json:
+    with open('parsed_pacs.002_payload.json', 'w') as f:
+        json.dump(fedwire_json, f, indent=4)
 
 print("pacs.002.001.10 XML parsed to JSON successfully!")
 ```
+
+## Command-Line Interface (CLI)
+
+The package includes a command-line tool, `miso20022`, for generating and parsing messages directly from your terminal.
+
+### Generating a Message
+
+**Usage:**
+
+```bash
+miso20022 generate --message_code [MESSAGE_CODE] --fed-aba [ABA_NUMBER] --input-file [PAYLOAD_FILE] --output-file [OUTPUT_XML]
+```
+
+**Arguments:**
+
+-   `--message_code`: The ISO 20022 message code (e.g., `urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08`).
+-   `--fed-aba`: The Fedwire ABA number.
+-   `--input-file`: Path to the input JSON payload file.
+-   `--output-file`: (Optional) Path to save the generated XML message.
+-   `--xsd-file`: (Optional) Path to the XSD file for validation.
+
+**Example:**
+
+```bash
+miso20022 generate \
+    --message_code urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 \
+    --fed-aba 021151080 \
+    --input-file sample_files/sample_payment.json \
+    --output-file pacs.008_output.xml
+```
+
+### Parsing a Message
+
+**Usage:**
+
+```bash
+miso20022 parse --input-file [INPUT_XML] --message-code [MESSAGE_CODE] --output-file [OUTPUT_JSON]
+```
+
+**Arguments:**
+
+-   `--input-file`: Path to the input ISO 20022 XML file.
+-   `--message-code`: The ISO 20022 message code of the input file.
+-   `--output-file`: (Optional) Path to save the output JSON payload.
+
+**Example:**
+
+```bash
+miso20022 parse \
+    --input-file sample_files/pacs.008.001.008_2025_1.xml \
+    --message-code urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 \
+    --output-file parsed_payload.json
+```
+
+---
 
 ## Supported Message Types
 
@@ -161,3 +219,5 @@ We are actively working to expand the range of supported message types. Future r
 ## Contributing
 
 Contributions are welcome! Please refer to the [main project repository](https://github.com/Mbanq/iso20022) for contribution guidelines, to open an issue, or to submit a pull request.
+
+
