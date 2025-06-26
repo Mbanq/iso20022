@@ -9,7 +9,7 @@ This library is the core component of the larger [ISO20022 Message Generator and
 You can install the package from PyPI:
 
 ```bash
-pip install mb-iso20022
+pip install miso20022
 ```
 
 ## Usage Examples
@@ -30,7 +30,7 @@ This example shows how to generate a Fedwire `pacs.008` message from a JSON payl
 
 ```python
 import json
-from mb_iso20022.fedwire import generate_fedwire_message
+from miso20022.fedwire import generate_fedwire_message
 
 # 1. Load your payment data from a JSON object
 with open('sample_files/sample_payload.json', 'r') as f:
@@ -62,7 +62,7 @@ This example shows how to generate a `pacs.028` payment status request.
 
 ```python
 import json
-from mb_iso20022.fedwire import generate_fedwire_message
+from miso20022.fedwire import generate_fedwire_message
 
 # 1. Load the payload for the status request
 with open('sample_files/sample_pacs028_payload.json', 'r') as f:
@@ -93,7 +93,7 @@ print("pacs.028.001.03 message generated successfully!")
 This example shows how to parse a `pacs.008` XML file and convert it into a simplified JSON object.
 
 ```python
-from mb_iso20022.fedwire import generate_fedwire_payload
+from miso20022.fedwire import generate_fedwire_payload
 import json
 
 # 1. Define the path to your XML file and the message code
@@ -115,7 +115,7 @@ print("pacs.008.001.08 XML parsed to JSON successfully!")
 This example shows how to parse a `pacs.002` payment status report (ack/nack) into a JSON object.
 
 ```python
-from mb_iso20022.fedwire import generate_fedwire_payload
+from miso20022.fedwire import generate_fedwire_payload
 import json
 
 # 1. Define the path to your XML file and the message code

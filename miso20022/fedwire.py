@@ -6,13 +6,13 @@ from typing import Dict, Any, Tuple, Optional, List, Union
 from datetime import datetime
 
 # Fix imports to use the correct package structure
-from mb_iso20022.bah.apphdr import AppHdr
-from mb_iso20022.pacs.pacs008 import Document as Pacs008Document 
-from mb_iso20022.pacs.pacs028 import Document as Pacs028Document
-from mb_iso20022.pacs.pacs002 import FIToFIPmtStsRpt
-from mb_iso20022.pacs.pacs008 import FIToFICstmrCdtTrf
-from mb_iso20022.helpers import dict_to_xml
-from mb_iso20022.helpers import parse_xml_to_json
+from miso20022.bah.apphdr import AppHdr
+from miso20022.pacs.pacs008 import Document as Pacs008Document 
+from miso20022.pacs.pacs028 import Document as Pacs028Document
+from miso20022.pacs.pacs002 import FIToFIPmtStsRpt
+from miso20022.pacs.pacs008 import FIToFICstmrCdtTrf
+from miso20022.helpers import dict_to_xml
+from miso20022.helpers import parse_xml_to_json
 
 def parse_message_envelope(xsd_path, message_code):
     """
@@ -159,7 +159,7 @@ def generate_message_structure(app_hdr_xml, document_xml, name, target_ns, root_
 
 def generate_fedwire_message(message_code: str, fed_aba: str, payload: Dict[str, Any], xsd_path: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
-    Generate a complete ISO20022 message using the models from mb_iso20022.
+    Generate a complete ISO20022 message using the models from miso20022.
     
     Args:
         message_code: The ISO20022 message code (e.g., urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08)

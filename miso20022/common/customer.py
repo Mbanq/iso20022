@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from mb_iso20022.common.account import IdAcct
+from miso20022.common.account import IdAcct
 
 
 @dataclass

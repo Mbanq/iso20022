@@ -3,7 +3,7 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mb-iso20022"
+name = "miso20022"
 version = "0.1.0"
 description = "ISO 20022 Message Generator for Financial Messaging"
 readme = "README.md"
@@ -42,14 +42,14 @@ webapp = [
 
 
 [project.urls]
-"Homepage" = "https://github.com/mbanq/mb-iso20022"
-"Bug Tracker" = "https://github.com/mbanq/mb-iso20022/issues"
+"Homepage" = "https://github.com/mbanq/miso20022"
+"Bug Tracker" = "https://github.com/mbanq/miso20022/issues"
 
 [project.scripts]
-mb-iso20022 = "mb_iso20022.cli:main"
+miso20022 = "miso20022.cli:main"
 
 [tool.setuptools]
-packages = ["mb_iso20022"]
+packages = ["miso20022"]
 
 [tool.black]
 line-length = 100

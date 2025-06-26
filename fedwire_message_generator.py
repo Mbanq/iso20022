@@ -15,7 +15,7 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 # Import the fedwire module functions
-from mb_iso20022.fedwire import generate_fedwire_message, generate_message_structure
+from miso20022.fedwire import generate_fedwire_message, generate_message_structure
 
 
 def load_sample_payload(sample_file_path: str) -> Dict[str, Any]:

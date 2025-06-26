@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Optional, List
 from uuid import uuid4
 
-from mb_iso20022.common import (
+from miso20022.common import (
     PstlAdr, ClrSysId, ClrSysMmbId, FinInstnId,
     InstgAgt, InstdAgt, GrpHdr, OrgnlGrpInf
 )

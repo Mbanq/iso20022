@@ -7,7 +7,7 @@ from string import ascii_letters, digits
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
-from mb_iso20022.common import *
+from miso20022.common import *
 
 
 @dataclass

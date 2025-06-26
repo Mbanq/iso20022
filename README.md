@@ -121,11 +121,11 @@ The web application provides a user-friendly interface for generating ISO 20022 
 -   Specify the message code.
 -   Generate and download the resulting ISO 20022 XML message.
 
-### 3. Python Library (`mb-iso20022`)
+### 3. Python Library (`miso20022`)
 
-The core logic of this project is also available as a standalone Python package, `mb-iso20022`. This is ideal if you want to integrate ISO 20022 message generation directly into your own applications.
+The core logic of this project is also available as a standalone Python package, `miso20022`. This is ideal if you want to integrate ISO 20022 message generation directly into your own applications.
 
-For detailed instructions on how to use the library, including installation and code examples, please see the [package-specific README](./mb_iso20022/README.md).
+For detailed instructions on how to use the library, including installation and code examples, please see the [package-specific README](./miso20022/README.md).
 
 
 ## Supported Message Types
@@ -135,7 +135,7 @@ The library has built-in support for the following Fedwire message types:
 -   `pacs.008.001.08`: FI to FI Customer Credit Transfer
 -   `pacs.028.001.03`: FI to FI Payment Status Request
 
-Support for other message types can be added by extending the data models in the `mb_iso20022` module.
+Support for other message types can be added by extending the data models in the `miso20022` module.
 
 ## Project Structure
 
@@ -143,7 +143,7 @@ Support for other message types can be added by extending the data models in the
 .
 ├── fedwire_message_generator.py  # CLI for generating messages
 ├── fedwire_payload_parser.py     # CLI for parsing messages
-├── mb_iso20022/                  # Core Python library
+├── miso20022/                  # Core Python library
 │   ├── __init__.py
 │   ├── bah/                      # Business Application Header models
 │   ├── common/                   # Common data models
