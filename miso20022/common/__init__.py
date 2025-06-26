@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """Common models shared across ISO20022 messages."""
 
 from miso20022.common.account import (

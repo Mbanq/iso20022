@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 """Common account-related models used across ISO20022 messages."""
 
 from dataclasses import dataclass

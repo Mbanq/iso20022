@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 import sys
 import re
 import json
@@ -253,7 +255,7 @@ def get_account_number(Acct):
 
     return ""
 
-def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf):
+def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf, grp_hdr_data):
     """Maps AppHdr and CdtTrfTxInf data classes to the Fedwire JSON format. Supports PACS008 Only"""
 
     # Helper to safely extract address lines
@@ -292,9 +294,9 @@ def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf):
     fedwire_message = {
         "fedWireMessage": {
             "inputMessageAccountabilityData": {
-                "inputCycleDate": app_hdr.BizMsgIdr[:8],
-                "inputSource": app_hdr.BizMsgIdr[8:13],
-                "inputSequenceNumber": app_hdr.BizMsgIdr[13:]
+                "inputCycleDate": grp_hdr_data.MsgId[:8],
+                "inputSource": grp_hdr_data.MsgId[8:13],
+                "inputSequenceNumber": grp_hdr_data.MsgId[13:]
             },
             "amount": {
                 "amount": str(int(float(cdt_trf_tx_inf.IntrBkSttlmAmt['#text'])))
@@ -366,10 +368,10 @@ def generate_fedwire_payload(xml_file, message_code):
     if message_code == "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08":
 
         app_hdr_instance = AppHdr.from_iso20022(data,message_code)
-        cdt_trf_tx_inf= FIToFICstmrCdtTrf.from_iso20022(data)
+        grp_hdr_data, cdt_trf_tx_inf = FIToFICstmrCdtTrf.from_iso20022(data)
 
         # 3. Map to Fedwire JSON format
-        fedwire_json = pacs_008_to_fedwire_json(app_hdr_instance, cdt_trf_tx_inf)
+        fedwire_json = pacs_008_to_fedwire_json(app_hdr_instance, cdt_trf_tx_inf, grp_hdr_data)
 
     elif message_code == "urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10":
 
