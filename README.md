@@ -1,176 +1,163 @@
-# ISO20022 Message Generator
+# ISO20022 Message Generator and Parser
 
-A Python library for generating ISO20022 compliant financial messages, with a focus on FedWire Funds Service compatibility.
-
-## Features
-
-- Generate ISO20022 compliant XML messages
-- Support for pacs.008 (FIToFICstmrCdtTrf) message type
-- Support for pacs.028 (FIToFIPmtStsRq) message type
-- Generate Fedwire ISO20022 compliant XML messages
-- Automatic handling of namespaces and XML structure
-- Clean XML output with no empty optional fields
-- Support for both AppHdr and Document components
-
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/iso20022.git
-cd iso20022
-
-# Install in development mode
-pip install -e .
-```
-
-## FedWire Messages
-
-### Command Line Interface
-
-The package provides a command-line interface for generating ISO20022 messages:
-
-```bash
-# Generate a message structure for a specific message code
-python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08
-
-# Generate a complete message using a sample payload
-python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --generate
-
-# Specify a custom XSD file
-python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --xsd-file path/to/custom.xsd
-
-# Specify a custom sample payload file
-python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --generate --sample-file path/to/payload.json
-
-# Specify an output file
-python fedwire_message_generator.py urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 --generate --output-file output.xml
-```
-
-### Python
-
-You can also use the library programmatically in your Python code:
-
-```python
-import json
-from mb_iso20022.fedwire import generate_fedwire_message
-
-# Load your payment data
-with open("sample_files/sample_payload.json", "r") as f:
-    payload = json.load(f)
-
-# Specify the message code and XSD path
-message_code = "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08"
-xsd_path = "proprietary_xsd/fedwirefunds-incoming.xsd"
-
-# Generate the message
-app_hdr_xml, document_xml, complete_message = generate_fedwire_message(message_code, payload, xsd_path)
-
-# Save to file
-with open("output.xml", "w") as f:
-    f.write(complete_message)
-```
-
-### Web Application
-
-The easiest way to generate ISO20022 messages is through the web application:
-
-```bash
-# Install the package with web application dependencies
-pip install -e .[webapp]
-
-# Run the web application
-python run_webapp.py
-```
-
-This will start a web server at http://localhost:8888 where you can:
-1. Select a message type from the dropdown menu
-2. Upload a proprietary XSD file
-3. Enter or upload a JSON payload
-4. Generate and download the ISO20022 message
-
-### Supported Message Types
-
-The library currently supports the following message types:
-
-- **pacs.008.001.08** - Customer Credit Transfer
-  - Full support with complete model class and validation
-  
-- **pacs.028.001.03** - Payment Status Request
-  - Full support with complete model class and validation
-
-### Sample Payload Format
-
-Your input JSON should follow this structure:
-
-```json
-{
-  "fedWireMessage": {
-    "inputMessageAccountabilityData": {
-      "inputCycleDate": "20250109",
-      "inputSource": "MBANQ",
-      "inputSequenceNumber": "001000001"
-    },
-    "amount": {
-      "amount": "1000",
-      "currency": "USD"
-    }
-    // ... other payment details
-  }
-}
-```
+This project provides a comprehensive suite of tools for working with ISO 20022 messages, with a special focus on the Fedwire Funds Service. It includes a message generator, a payload parser, and a web application to streamline the process of creating and handling ISO 20022 messages.
 
 ## Key Features
 
-- **Clean XML Output**: The library automatically removes empty optional fields from the XML output, ensuring clean and valid ISO20022 messages.
-- **Namespace Handling**: Proper namespace prefixing and declarations are automatically managed.
-- **Type Safety**: Uses Python dataclasses for type safety and validation.
-- **Extensible**: Easy to add support for additional ISO20022 message types.
+-   **Message Generation**: Create fully compliant ISO 20022 XML messages from a JSON payload.
+-   **Payload Parser**: Convert existing ISO 20022 XML messages into a structured JSON payload.
+-   **Fedwire Support**: Specialized support for Fedwire messages, including `pacs.008.001.08` and `pacs.028.001.03`.
+-   **Web Application**: An intuitive web-based interface for generating messages without writing any code.
+-   **Command-Line Tools**: Powerful command-line scripts for both message generation and parsing.
+-   **Extensible Library**: A well-structured Python library that can be easily integrated into your own applications.
 
-## Development
+## Installation
 
-Generate a sample file:
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/your-username/iso20022.git
+    cd iso20022
+    ```
+
+2.  **Install the required dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3.  **Install the package in editable mode:**
+
+    ```bash
+    pip install -e .
+    ```
+
+## Usage
+
+This project offers three primary ways to interact with ISO 20022 messages: the command-line interface, the web application, and the Python library.
+
+### 1. Command-Line Interface (CLI)
+
+The CLI provides two main scripts: `fedwire_message_generator.py` for creating messages and `fedwire_payload_parser.py` for parsing them.
+
+#### Message Generation (`fedwire_message_generator.py`)
+
+This script generates a complete ISO 20022 message from a JSON payload.
+
+**Usage:**
 
 ```bash
-python generate_sample_payment_file.py
+python3 fedwire_message_generator.py --generate --sample-file [PAYLOAD_FILE] --output-file [OUTPUT_XML] --fed-aba [ABA_NUMBER] [MESSAGE_CODE]
 ```
 
-## Web Application
+**Arguments:**
 
-The project includes a web application that allows you to generate ISO20022 messages through a user-friendly interface:
+-   `--generate`: Flag to indicate that a message should be generated.
+-   `--sample-file`: Path to the input JSON payload file.
+-   `--output-file`: Path to save the generated XML message.
+-   `--fed-aba`: The Fedwire ABA number.
+-   `MESSAGE_CODE`: The ISO 20022 message code (e.g., `urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08`).
 
-1. Install the package with web application dependencies:
-   ```bash
-   pip install -e .[webapp]
-   ```
+**Example:**
 
-2. Run the web application using the provided script:
-   ```bash
-   python run_webapp.py
-   ```
+```bash
+python3 fedwire_message_generator.py \
+    --generate \
+    --sample-file sample_files/sample_payload.json \
+    --output-file pacs.008_output.xml \
+    --fed-aba 021151080 \
+    urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08
+```
 
-3. Open your browser and navigate to http://localhost:8888
+#### Payload Parser (`fedwire_payload_parser.py`)
 
-The web application allows you to:
-- Upload a proprietary XSD file
-- Enter or upload a JSON payload
-- Select a message type from the dropdown
-- Generate and download ISO20022 messages
+This script parses an existing ISO 20022 XML file and converts it into a JSON payload.
 
-## Important Notice on Proprietary Envelope
+**Usage:**
 
-The Fedwire envelope format is proprietary and must be implemented according to the Federal Reserve specifications. This library only generates the ISO 20022 message content (AppHdr and Document) that goes inside the envelope.
+```bash
+python3 fedwire_payload_parser.py [INPUT_XML] [MESSAGE_CODE]
+```
 
-For official information about Fedwire ISO 20022 implementation, including envelope specifications, please consult:
-- [Federal Reserve ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center)
-- Federal Reserve's MyStandards platform (requires registration)
-- The Fedwire Funds Service ISO 20022 Implementation Guide
+**Arguments:**
+
+-   `INPUT_XML`: Path to the input ISO 20022 XML file.
+-   `MESSAGE_CODE`: The ISO 20022 message code of the input file.
+
+**Example:**
+
+```bash
+python3 fedwire_payload_parser.py sample_files/pacs.008.001.008_2025_1.xml pacs.008.001.08
+```
+
+This will create a `pacs.008.001.008_2025_1_output.json` file in the same directory.
+
+### 2. Web Application
+
+The web application provides a user-friendly interface for generating ISO 20022 messages.
+
+**Running the Web App:**
+
+1.  **Install web dependencies (if not already installed):**
+
+    ```bash
+    pip install Flask Werkzeug
+    ```
+
+2.  **Run the application:**
+
+    ```bash
+    python3 webapp/app.py
+    ```
+
+3.  **Access the application:**
+
+    Open your web browser and navigate to `http://127.0.0.1:5000`.
+
+**Features:**
+
+-   Upload an XSD file for schema validation.
+-   Provide a JSON payload by uploading a file or pasting text.
+-   Specify the message code.
+-   Generate and download the resulting ISO 20022 XML message.
+
+### 3. Python Library (`mb-iso20022`)
+
+The core logic of this project is also available as a standalone Python package, `mb-iso20022`. This is ideal if you want to integrate ISO 20022 message generation directly into your own applications.
+
+For detailed instructions on how to use the library, including installation and code examples, please see the [package-specific README](./mb_iso20022/README.md).
 
 
-## License
+## Supported Message Types
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+The library has built-in support for the following Fedwire message types:
 
-<p align="center"><img src="image.png" width="200"/></p>
+-   `pacs.008.001.08`: FI to FI Customer Credit Transfer
+-   `pacs.028.001.03`: FI to FI Payment Status Request
 
+Support for other message types can be added by extending the data models in the `mb_iso20022` module.
 
-<p align="center"><strong style="font-size: 2em">Built with :heart: in the Beautiful State of Washington!</strong></p>
+## Project Structure
+
+```
+.
+├── fedwire_message_generator.py  # CLI for generating messages
+├── fedwire_payload_parser.py     # CLI for parsing messages
+├── mb_iso20022/                  # Core Python library
+│   ├── __init__.py
+│   ├── bah/                      # Business Application Header models
+│   ├── common/                   # Common data models
+│   ├── pacs/                     # Payments Clearing and Settlement models
+│   └── ...
+├── schemas/                      # XSD schema files
+├── sample_files/                 # Sample XML and JSON files
+├── webapp/                       # Flask web application
+│   ├── app.py
+│   └── templates/
+│       └── index.html
+└── README.md
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a pull request or open an issue for any bugs, feature requests, or improvements.
