@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 # Import the fedwire module functions
 from miso20022.fedwire import generate_fedwire_message
+from webapp.parser import parse_xml_message
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = tempfile.mkdtemp()
@@ -50,10 +51,13 @@ def generate_message():
         xsd_path = os.path.join(app.config['UPLOAD_FOLDER'], xsd_filename)
         xsd_file.save(xsd_path)
         
-        # Get message code
+        # Get message code, environment, and Fed ABA
         message_code = request.form.get('message_code')
-        if not message_code:
-            return jsonify({'error': 'Message code is required'}), 400
+        environment = request.form.get('environment')
+        fed_aba = request.form.get('fed_aba')
+        
+        if not all([message_code, environment, fed_aba]):
+            return jsonify({'error': 'Missing required fields: message_code, environment, or fed_aba'}), 400
         
         # Get payload - either from file upload or text input
         payload = None
@@ -72,7 +76,13 @@ def generate_message():
             return jsonify({'error': 'No payload provided'}), 400
         
         # Generate the message
-        app_hdr_xml, document_xml, complete_message = generate_fedwire_message(message_code, payload, xsd_path)
+        app_hdr_xml, document_xml, complete_message = generate_fedwire_message(
+            message_code=message_code,
+            payload=payload,
+            xsd_path=xsd_path,
+            environment=environment,
+            fed_aba=fed_aba
+        )
         
         if not complete_message:
             return jsonify({'error': 'Failed to generate message'}), 500
@@ -96,6 +106,27 @@ def generate_message():
         error_traceback = traceback.format_exc()
         print(f"Error generating message: {str(e)}\n{error_traceback}")
         return jsonify({'error': f'Error generating message: {str(e)}'}), 500
+
+
+
+@app.route('/parse', methods=['POST'])
+def parse_file():
+    """Parse an uploaded ISO20022 XML file."""
+    if 'xmlFile' not in request.files or not request.files['xmlFile'].filename:
+        return jsonify({'error': 'No file selected'}), 400
+
+    file = request.files['xmlFile']
+    message_code = request.form.get('message_code')
+
+    if not message_code:
+        return jsonify({'error': 'Message code is required'}), 400
+
+    try:
+        xml_content = file.read().decode('utf-8')
+        parsed_dict = parse_xml_message(xml_content, message_code)
+        return jsonify(parsed_dict)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/download/<filename>')
 def download_file(filename):

@@ -132,12 +132,9 @@ _, _, complete_message = generate_fedwire_message(
     xsd_path=xsd_path
 )
 
-# 4. Save the message to a file
+# 4. The `complete_message` variable now holds the XML string
 if complete_message:
-    with open('generated_pacs.008.xml', 'w') as f:
-        f.write(complete_message)
-
-print("pacs.008.001.08 message generated successfully!")
+    print(complete_message)
 ```
 
 ### Generating a `pacs.028.001.03` (Payment Status Request) Message
@@ -167,12 +164,9 @@ _, _, complete_message = generate_fedwire_message(
     xsd_path=xsd_path
 )
 
-# 4. Save the message to a file
+# 4. The `complete_message` variable now holds the XML string
 if complete_message:
-    with open('generated_pacs.028.xml', 'w') as f:
-        f.write(complete_message)
-
-print("pacs.028.001.03 message generated successfully!")
+    print(complete_message)
 ```
 
 ### Parsing a `pacs.008.001.08` XML to JSON
@@ -190,12 +184,9 @@ message_code = 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08'
 # 2. Parse the XML file
 fedwire_json = generate_fedwire_payload(xml_file, message_code)
 
-# 3. Save the JSON payload to a file
+# 3. The `fedwire_json` variable now holds the parsed dictionary
 if fedwire_json:
-    with open('parsed_pacs.008.json', 'w') as f:
-        json.dump(fedwire_json, f, indent=4)
-
-print("pacs.008.001.08 XML parsed to JSON successfully!")
+    print(json.dumps(fedwire_json, indent=4))
 ```
 
 ### Parsing a `pacs.002.001.10` (Payment Status Report) XML to JSON
@@ -213,12 +204,9 @@ message_code = 'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10'
 # 2. Parse the XML to get the JSON payload
 fedwire_json = generate_fedwire_payload(xml_file, message_code)
 
-# 3. Save the payload to a JSON file
+# 3. The `fedwire_json` variable now holds the parsed dictionary
 if fedwire_json:
-    with open('parsed_pacs.002_payload.json', 'w') as f:
-        json.dump(fedwire_json, f, indent=4)
-
-print("pacs.002.001.10 XML parsed to JSON successfully!")
+    print(json.dumps(fedwire_json, indent=4))
 ```
 
 ## Command-Line Interface (CLI)

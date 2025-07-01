@@ -181,6 +181,13 @@ Support for other message types can be added by extending the data models in the
 └── venv/ # Contains the virtual environment
 ```
 
+## Fedwire Payments
+
+This project can be used to generate the message content for Fedwire payments, which utilize the ISO 20022 standard. However, the message envelope format for Fedwire is proprietary. Users must obtain the necessary proprietary XSD files from the Federal Reserve and integrate them to create complete Fedwire messages. This project does not include any proprietary information or files.
+
+For more information on Fedwire's ISO 20022 implementation and to access the required files, please visit the [Federal Reserve ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center).
+
+
 ### Important Notice on Proprietary Envelope
 The Fedwire envelope format is proprietary and must be implemented according to the Federal Reserve specifications. This library only generates the ISO 20022 message content and wraps them in the message envelope only if the propietory XSD is provided.
 
@@ -198,6 +205,19 @@ For official information about Fedwire ISO 20022 implementation, including envel
 
 Contributions are welcome! Please feel free to open an issue for any bugs, feature requests, or improvements.
 
+## Issues and Bug Reports
+
+If you encounter any bugs or have a feature request, please open an issue on our [GitHub Issues page](https://github.com/Mbanq/iso20022/issues).
+
+When reporting a bug, please include the following information:
+
+-   A clear and concise description of the issue.
+-   Steps to reproduce the behavior.
+-   The expected behavior.
+-   The actual behavior.
+-   Your operating system and Python version.
+
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
