@@ -1,161 +1,203 @@
-# ISO20022Gen
+# ISO20022 Message Generator and Parser
 
-A Python library for generating ISO 20022 compliant financial messages, with a focus on FedWire Funds Service compatibility.
+This project provides a comprehensive suite of tools for working with ISO 20022 messages, with a special focus on the US Payment Rails. It includes a message generator, a payload parser, and a web application to streamline the process of creating and handling ISO 20022 messages.
 
-## About This Project
+## Key Features
 
-This open-source library focuses **exclusively** on generating the ISO 20022 XML content for financial messages. The library **does not generate the proprietary Fedwire envelope** which must be implemented separately according to Federal Reserve specifications.
-
-For information on the proprietary Fedwire envelope format and specifications, please refer to the [Federal Reserve's ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center).
-
-## Features
-
-- Generate ISO 20022 compliant XML messages for financial transactions
-- Support for pacs.008.001.08 message generation
-- Validated against official ISO 20022 schemas
-- Simple API for integrating with existing financial systems
-- Command-line interface for direct usage
+-   **Message Generation**: Create fully compliant ISO 20022 XML messages from a JSON payload.
+-   **Payload Parser**: Convert existing ISO 20022 XML messages into a structured JSON payload.
+-   **Fedwire Support**: Specialized support for Fedwire messages, including `pacs.008.001.08` and `pacs.028.001.03`.
+-   **Web Application**: An intuitive web-based interface for generating messages without writing any code.
+-   **Command-Line Tools**: Powerful command-line scripts for both message generation and parsing.
+-   **Extensible Library**: A well-structured Python library that can be easily integrated into your own applications.
 
 ## Installation
 
-```bash
-pip install iso20022gen
-```
+There are two ways to install the project, depending on your needs.
 
-## Quick Start
+### Standard Installation (Recommended)
 
-### Generating an ISO 20022 Message
-
-```python
-from iso20022gen import Iso20022CodeGen
-import json
-
-# Load your payment data
-with open("payment_data.json", "r") as f:
-    payment_data = json.load(f)
-
-# Initialize the generator
-generator = Iso20022CodeGen()
-
-# Generate the ISO 20022 message
-result = generator.process(payment_data)
-
-if result["statusCode"] == 200:
-    # Access the generated ISO 20022 XML
-    iso_message = result["body"]
-    print(iso_message)
-```
-
-### Command Line Usage
+If you want to use the `miso20022` library or CLI tools in your own projects, you can install it directly from PyPI:
 
 ```bash
-# Generate ISO 20022 message from payment data
-iso20022gen generate payment_data.json
+pip install miso20022
 ```
+
+This will download and install the latest stable release.
+
+### Developer Installation
+
+If you want to contribute to the project or need the very latest (unreleased) changes, you should clone the repository and install it in editable mode.
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/Mbanq/iso20022.git
+    cd iso20022
+    ```
+
+2.  **Install the required dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3.  **Install the package in editable mode:**
+
+    This allows you to make changes to the source code and have them immediately reflected in your environment.
+
+    ```bash
+    pip install -e .
+    ```
+
+## Usage
+
+This project offers three primary ways to interact with ISO 20022 messages: the command-line interface, the web application, and the Python library.
+
+### 1. Command-Line Interface (CLI)
+
+The CLI provides a single entry point, `miso20022`, with two main commands: `generate` for creating messages and `parse` for parsing them.
+
+#### Message Generation (`generate`)
+
+This command generates a complete ISO 20022 message from a JSON payload.
+
+**Usage:**
+
+```bash
+miso20022 generate --message_code [MESSAGE_CODE] --environment [ENV] --fed-aba [ABA_NUMBER] --input-file [PAYLOAD_FILE] --output-file [OUTPUT_XML]
+```
+
+**Arguments:**
+
+-   `--message_code`: The ISO 20022 message code (e.g., `urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08`).
+-   `--environment`: The environment for the message (`TEST` or `PROD`).
+-   `--fed-aba`: The Fedwire ABA number.
+-   `--input-file`: Path to the input JSON payload file.
+-   `--output-file`: (Optional) Path to save the generated XML message. If not provided, a filename will be generated automatically.
+-   `--xsd-file`: Path to the XSD file for validation. Defaults to `proprietary_Fed_Format.xsd`.
+
+**Example:**
+
+```bash
+miso20022 generate \
+    --message_code urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 \
+    --environment TEST \
+    --fed-aba 00088444 \
+    --input-file sample_files/sample_payment.json \
+    --output-file pacs.008_output.xml
+```
+
+#### Payload Parser (`parse`)
+
+This command parses an existing ISO 20022 XML file and converts it into a JSON payload.
+
+**Usage:**
+
+```bash
+miso20022 parse --input-file [INPUT_XML] --message-code [MESSAGE_CODE] --output-file [OUTPUT_JSON]
+```
+
+**Arguments:**
+
+-   `--input-file`: Path to the input ISO 20022 XML file.
+-   `--message-code`: The ISO 20022 message code of the input file.
+-   `--output-file`: (Optional) Path to save the output JSON payload. If not provided, a filename will be generated automatically.
+
+**Example:**
+
+```bash
+miso20022 parse \
+    --input-file sample_files/pacs.008.001.008_2025_1.xml \
+    --message-code urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 \
+    --output-file parsed_payload.json
+```
+
+This will create a `parsed_payload.json` file in the current directory.
+
+### 2. Web Application
+
+The web application provides a user-friendly interface for generating ISO 20022 messages.
+
+**Running the Web App:**
+
+1.  **Install web dependencies (if not already installed):**
+
+    ```bash
+    pip install Flask Werkzeug
+    ```
+
+2.  **Run the application:**
+
+    ```bash
+    python3 webapp/app.py
+    ```
+
+3.  **Access the application:**
+
+    Open your web browser and navigate to `http://127.0.0.1:5000`.
+
+**Features:**
+
+-   Upload an XSD file for schema validation.
+-   Provide a JSON payload by uploading a file or pasting text.
+-   Specify the message code.
+-   Generate and download the resulting ISO 20022 XML message.
+
+### 3. Python Library (`miso20022`)
+
+The core logic of this project is also available as a standalone Python package, `miso20022`. This is ideal if you want to integrate ISO 20022 message generation directly into your own applications.
+
+For detailed instructions on how to use the library, including installation and code examples, please see the [package-specific README](./miso20022/README.md).
+
+
+## Supported Message Types
+
+The library has built-in support for the following Fedwire message types:
+
+-   `pacs.008.001.08`: FI to FI Customer Credit Transfer
+-   `pacs.028.001.03`: FI to FI Payment Status Request
+
+Support for other message types can be added by extending the data models in the `miso20022` module.
 
 ## Project Structure
 
-- `code_generator.py`: The core ISO 20022 message generation functionality
-- `config.py`: Configuration handling for the library
+```
+.
 
-## Important Notice on Proprietary Envelope
+├── LICENSE
+├── README.md
+├── miso20022/
+│   ├── README.md
+│   ├── __init__.py
+│   ├── bah/ # Contains the bah message models
+│   ├── cli.py # Contains the command line interface
+│   ├── fedwire.py # Contains the fedwire message generator
+│   ├── helpers.py # Contains the helper functions
+│   └── pacs/ # Contains the pacs message models
+├── pyproject.toml # Contains the project metadata
+├── webapp # Contains the web application
+├── validate_xml.py # Contains the xml validator
+└── venv/ # Contains the virtual environment
+```
 
-The Fedwire envelope format is proprietary and must be implemented according to the Federal Reserve specifications. This library only generates the ISO 20022 message content (AppHdr and Document) that goes inside the envelope.
+### Important Notice on Proprietary Envelope
+The Fedwire envelope format is proprietary and must be implemented according to the Federal Reserve specifications. This library only generates the ISO 20022 message content and wraps them in the message envelope only if the propietory XSD is provided.
+
+For Fedwire: 
+
+[Get Access to Prorietory XSD](https://www.frbservices.org/binaries/content/assets/crsocms/resources/financial-services/request-access-fedwire-funds-iso-20022-technical-guide.pdf)
 
 For official information about Fedwire ISO 20022 implementation, including envelope specifications, please consult the following resources:
 
 - [Federal Reserve ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center)
-- Federal Reserve's MyStandards platform (requires registration)
-- The Fedwire Funds Service ISO 20022 Implementation Guide and Technical Guide
-
-## Documentation
-
-For detailed documentation, please visit our [documentation site](https://iso20022gen.readthedocs.io/).
-
-## Input Format
-
-The library expects payment data in a specific JSON format. Here's an example:
-
-```json
-{
-  "fedWireMessage": {
-    "inputMessageAccountabilityData": {
-      "inputCycleDate": "20250109",
-      "inputSource": "MBANQ001",
-      "inputSequenceNumber": "000001"
-    },
-    "amount": {
-      "amount": "000000001000"
-    },
-    "senderDepositoryInstitution": {
-      "senderABANumber": "121182904",
-      "senderShortName": "EXAMPLE BANK NAME"
-    },
-    "receiverDepositoryInstitution": {
-      "receiverABANumber": "084106768",
-      "receiverShortName": "RECEIVING BANK"
-    },
-    "beneficiary": {
-      "personal": {
-        "identificationCode": "D",
-        "identifier": "9512227031535633",
-        "name": "JOHN DOE",
-        "address": {
-          "addressLineOne": "123 MAIN STREET",
-          "addressLineTwo": "ANYTOWN TX 12345"
-        }
-      }
-    },
-    "originator": {
-      "personal": {
-        "identificationCode": "D",
-        "identifier": "550103129900943",
-        "name": "JANE SMITH",
-        "address": {
-          "addressLineOne": "456 OAK AVENUE",
-          "addressLineTwo": "SOMEWHERE CA 67890",
-          "addressLineThree": ""
-        }
-      }
-    }
-  }
-}
-```
-
-## Output
-
-The library generates ISO 20022 compliant XML consisting of:
-1. AppHdr - The ISO 20022 business application header
-2. Document - The ISO 20022 pacs.008 document
-
-**NOTE:** These XML components must be wrapped in the proprietary Fedwire envelope according to Federal Reserve specifications before being sent to the Fedwire Funds Service. The envelope generation is not part of this open-source project.
+- [Federal Reserve's MyStandards platform](https://www2.swift.com/mystandards/#/group/Federal_Reserve_Financial_Services/Fedwire_Funds_Service)
+- [The Fedwire Funds Service ISO 20022 Implementation Guide and Technical Guide](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center)
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Install development dependencies (`pip install -e ".[dev]"`)
-4. Commit your changes (`git commit -m 'Add some amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-Please make sure your code adheres to our coding standards by running:
-
-```bash
-black iso20022gen tests
-isort iso20022gen tests
-flake8 iso20022gen tests
-mypy iso20022gen tests
-pytest
-```
+Contributions are welcome! Please feel free to open an issue for any bugs, feature requests, or improvements.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- ISO 20022 Standard (www.iso20022.org)
-- [Federal Reserve Financial Services](https://www.frbservices.org/) for Fedwire specifications 
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

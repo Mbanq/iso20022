@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISO20022 Message Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #f1f8ff;
+            border-bottom: 1px solid #d1e7ff;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+        .form-control, .form-select {
+            border-radius: 6px;
+        }
+        #message-output {
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+        .nav-tabs .nav-link {
+            border-radius: 6px 6px 0 0;
+        }
+        .nav-tabs .nav-link.active {
+            background-color: #f8f9fa;
+            border-color: #dee2e6 #dee2e6 #f8f9fa;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="display-5 fw-bold text-primary">
+                    <i class="bi bi-file-earmark-code"></i> ISO20022 Message Generator
+                </h1>
+                <p class="lead">Upload an XSD file and provide a JSON payload to generate ISO20022 messages</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-gear"></i> Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="message-form" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="message-code" class="form-label">Message Code</label>
+                                <select class="form-select" id="message-code" name="message_code" required>
+                                    <option value="" selected disabled>Select a message type</option>
+                                    <option value="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">pacs.008.001.08 - Customer Credit Transfer</option>
+                                    <option value="urn:iso:std:iso:20022:tech:xsd:pacs.028.001.03">pacs.028.001.03 - Payment Status Request</option>
+                                </select>
+                                <div class="form-text">Select the ISO20022 message type to generate</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="xsd-file" class="form-label">XSD File</label>
+                                <input type="file" class="form-control" id="xsd-file" name="xsd_file" accept=".xsd" required>
+                                <div class="form-text">Upload the proprietary XSD file</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">JSON Payload</label>
+                                <ul class="nav nav-tabs" id="payloadTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-payload" 
+                                            type="button" role="tab" aria-controls="text-payload" aria-selected="true">Text Input</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-payload" 
+                                            type="button" role="tab" aria-controls="file-payload" aria-selected="false">File Upload</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content mt-2" id="payloadTabContent">
+                                    <div class="tab-pane fade show active" id="text-payload" role="tabpanel" aria-labelledby="text-tab">
+                                        <textarea class="form-control" id="payload-text" name="payload_text" rows="10" 
+                                            placeholder='{"fedWireMessage": {...}}' data-required="true"></textarea>
+                                    </div>
+                                    <div class="tab-pane fade" id="file-payload" role="tabpanel" aria-labelledby="file-tab">
+                                        <input type="file" class="form-control" id="payload-file" name="payload_file" accept=".json" data-required="true">
+                                    </div>
+                                </div>
+                                <div class="form-text">Provide the JSON payload either as text or upload a file</div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-lightning"></i> Generate Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Generated Message</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="loading" id="loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Generating message...</p>
+                        </div>
+                        
+                        <div id="result-container" style="display: none;">
+                            <ul class="nav nav-tabs" id="resultTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="complete-tab" data-bs-toggle="tab" data-bs-target="#complete-message" 
+                                        type="button" role="tab" aria-controls="complete-message" aria-selected="true">Complete Message</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="app-hdr-tab" data-bs-toggle="tab" data-bs-target="#app-hdr" 
+                                        type="button" role="tab" aria-controls="app-hdr" aria-selected="false">App Header</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="document-tab" data-bs-toggle="tab" data-bs-target="#document" 
+                                        type="button" role="tab" aria-controls="document" aria-selected="false">Document</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content mt-3" id="resultTabContent">
+                                <div class="tab-pane fade show active" id="complete-message" role="tabpanel" aria-labelledby="complete-tab">
+                                    <pre id="message-output"></pre>
+                                </div>
+                                <div class="tab-pane fade" id="app-hdr" role="tabpanel" aria-labelledby="app-hdr-tab">
+                                    <pre id="app-hdr-output"></pre>
+                                </div>
+                                <div class="tab-pane fade" id="document" role="tabpanel" aria-labelledby="document-tab">
+                                    <pre id="document-output"></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                <button class="btn btn-outline-secondary" id="copy-btn">
+                                    <i class="bi bi-clipboard"></i> Copy to Clipboard
+                                </button>
+                                <a href="#" class="btn btn-success" id="download-btn" download>
+                                    <i class="bi bi-download"></i> Download XML
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div id="error-container" class="alert alert-danger" style="display: none;">
+                            <i class="bi bi-exclamation-triangle"></i> <span id="error-message"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Sample Payload</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>You can use the following sample payload structure for testing:</p>
+                        <pre class="bg-light p-3 rounded">
+{
+  "fedWireMessage": {
+    "inputMessageAccountabilityData": {
+      "inputCycleDate": "20250109",
+      "inputSource": "MBANQ",
+      "inputSequenceNumber": "001000001"
+    },
+    "amount": {
+      "amount": "1000"
+    },
+    "senderDepositoryInstitution": {
+      "senderABANumber": "121182904",
+      "senderShortName": "NORTH BAY CREDIT U"
+    },
+    "receiverDepositoryInstitution": {
+      "receiverABANumber": "084106768",
+      "receiverShortName": "EVOLVE BANK & TRUST"
+    },
+    "originator": {
+      "personal": {
+        "name": "JANE SMITH",
+        "address": {
+          "addressLineOne": "456 OAK AVENUE",
+          "addressLineTwo": "SOMEWHERE, CA 67890",
+          "addressLineThree": ""
+        },
+        "identifier": "550103129900943"
+      }
+    },
+    "beneficiary": {
+      "personal": {
+        "name": "JOHN DOE",
+        "address": {
+          "addressLineOne": "123 MAIN STREET",
+          "addressLineTwo": "ANYTOWN, TX 12345",
+          "addressLineThree": ""
+        },
+        "identifier": "9512227031535633"
+      }
+    }
+  },
+  "receiverRoutingNumber": "021151080"
+}</pre>
+                        <p class="mt-2">For pacs.028 messages, additional fields are required:</p>
+                        <pre class="bg-light p-3 rounded">
+{
+  "fedWireMessage": { ... },
+  "original_msg_id": "20250109MBANQ001000001",
+  "original_msg_nm_id": "pacs.008.001.08",
+  "original_creation_datetime": "2025-01-09T10:00:00Z"
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('message-form');
+            const payloadTabs = document.getElementById('payloadTabs');
+            const textPayload = document.getElementById('payload-text');
+            const filePayload = document.getElementById('payload-file');
+            const resultContainer = document.getElementById('result-container');
+            const errorContainer = document.getElementById('error-container');
+            const errorMessage = document.getElementById('error-message');
+            const messageOutput = document.getElementById('message-output');
+            const appHdrOutput = document.getElementById('app-hdr-output');
+            const documentOutput = document.getElementById('document-output');
+            const downloadBtn = document.getElementById('download-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const loading = document.getElementById('loading');
+
+            // Handle tab switching for payload input
+            payloadTabs.addEventListener('shown.bs.tab', function(event) {
+                if (event.target.id === 'text-tab') {
+                    textPayload.setAttribute('data-required', 'true');
+                    filePayload.setAttribute('data-required', 'false');
+                } else {
+                    textPayload.setAttribute('data-required', 'false');
+                    filePayload.setAttribute('data-required', 'true');
+                }
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Validate form
+                const messageCode = document.getElementById('message-code').value;
+                const xsdFile = document.getElementById('xsd-file').files[0];
+                
+                if (!messageCode || !xsdFile) {
+                    showError('Please fill in all required fields');
+                    return;
+                }
+                
+                // Check if payload is provided based on active tab
+                const textTabActive = document.getElementById('text-tab').classList.contains('active');
+                if (textTabActive && !textPayload.value.trim()) {
+                    showError('Please provide a JSON payload');
+                    return;
+                }
+                
+                if (!textTabActive && !filePayload.files[0]) {
+                    showError('Please upload a JSON payload file');
+                    return;
+                }
+                
+                // Hide previous results and errors
+                resultContainer.style.display = 'none';
+                errorContainer.style.display = 'none';
+                loading.style.display = 'block';
+                
+                // Create form data
+                const formData = new FormData(form);
+                
+                // Send request
+                fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = 'none';
+                    
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+                    
+                    // Show results
+                    resultContainer.style.display = 'block';
+                    messageOutput.textContent = data.complete_message;
+                    appHdrOutput.textContent = data.app_hdr;
+                    documentOutput.textContent = data.document;
+                    
+                    // Set download link
+                    downloadBtn.href = `/download/${data.filename}`;
+                    downloadBtn.download = data.filename;
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    showError('An error occurred: ' + error.message);
+                });
+            });
+            
+            // Copy to clipboard
+            copyBtn.addEventListener('click', function() {
+                const activeTab = document.querySelector('#resultTabs .nav-link.active');
+                let textToCopy = '';
+                
+                if (activeTab.id === 'complete-tab') {
+                    textToCopy = messageOutput.textContent;
+                } else if (activeTab.id === 'app-hdr-tab') {
+                    textToCopy = appHdrOutput.textContent;
+                } else if (activeTab.id === 'document-tab') {
+                    textToCopy = documentOutput.textContent;
+                }
+                
+                navigator.clipboard.writeText(textToCopy)
+                    .then(() => {
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        showError('Failed to copy: ' + err);
+                    });
+            });
+            
+            // Helper function to show errors
+            function showError(message) {
+                errorContainer.style.display = 'block';
+                errorMessage.textContent = message;
+            }
+        });
+    </script>
+</body>
+</html>

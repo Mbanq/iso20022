@@ -1,0 +1,22 @@
+{
+  "fedWireMessage": {
+    "inputMessageAccountabilityData": {
+      "inputCycleDate": "20250109",
+      "inputSource": "MBANQ",
+      "inputSequenceNumber": "001000002"
+    },
+    "senderDepositoryInstitution": {
+      "senderABANumber": "000000000",
+      "senderShortName": "NORTH BAY CREDIT U"
+    },
+    "receiverDepositoryInstitution": {
+      "receiverABANumber": "1111111111",
+      "receiverShortName": "EVOLVE BANK & TRUST"
+    }
+  },
+  "message_id": "PACS028REQ20250109001",
+  "original_msg_id": "20250109MBANQ001000001",
+  "original_msg_nm_id": "pacs.008.001.08",
+  "original_creation_datetime": "2025-01-09T12:34:56Z",
+  "original_end_to_end_id": "MEtoEIDCJShqZKb"
+}
