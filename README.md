@@ -198,6 +198,18 @@ For official information about Fedwire ISO 20022 implementation, including envel
 
 Contributions are welcome! Please feel free to open an issue for any bugs, feature requests, or improvements.
 
+## Issues and Bug Reports
+
+If you encounter any bugs or have a feature request, please open an issue on our [GitHub Issues page](https://github.com/Mbanq/iso20022/issues).
+
+When reporting a bug, please include the following information:
+
+-   A clear and concise description of the issue.
+-   Steps to reproduce the behavior.
+-   The expected behavior.
+-   The actual behavior.
+-   Your operating system and Python version.
+
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
