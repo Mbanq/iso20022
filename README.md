@@ -181,6 +181,13 @@ Support for other message types can be added by extending the data models in the
 └── venv/ # Contains the virtual environment
 ```
 
+## Fedwire Payments
+
+This project can be used to generate the message content for Fedwire payments, which utilize the ISO 20022 standard. However, the message envelope format for Fedwire is proprietary. Users must obtain the necessary proprietary XSD files from the Federal Reserve and integrate them to create complete Fedwire messages. This project does not include any proprietary information or files.
+
+For more information on Fedwire's ISO 20022 implementation and to access the required files, please visit the [Federal Reserve ISO 20022 Implementation Center](https://www.frbservices.org/resources/financial-services/wires/iso-20022-implementation-center).
+
+
 ### Important Notice on Proprietary Envelope
 The Fedwire envelope format is proprietary and must be implemented according to the Federal Reserve specifications. This library only generates the ISO 20022 message content and wraps them in the message envelope only if the propietory XSD is provided.
 
@@ -213,3 +220,4 @@ When reporting a bug, please include the following information:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
