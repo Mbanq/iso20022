@@ -6,74 +6,37 @@
     <title>ISO20022 Message Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .container {
-            max-width: 1200px;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background-color: #f1f8ff;
-            border-bottom: 1px solid #d1e7ff;
-        }
-        .btn-primary {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
-        .btn-primary:hover {
-            background-color: #0b5ed7;
-            border-color: #0a58ca;
-        }
-        .form-control, .form-select {
-            border-radius: 6px;
-        }
-        #message-output {
-            max-height: 500px;
-            overflow-y: auto;
-            font-family: monospace;
-            white-space: pre-wrap;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 6px;
-            border: 1px solid #dee2e6;
-        }
-        .nav-tabs .nav-link {
-            border-radius: 6px 6px 0 0;
-        }
-        .nav-tabs .nav-link.active {
-            background-color: #f8f9fa;
-            border-color: #dee2e6 #dee2e6 #f8f9fa;
-        }
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container py-4">
-        <div class="row mb-4">
-            <div class="col">
-                <h1 class="display-5 fw-bold text-primary">
-                    <i class="bi bi-file-earmark-code"></i> ISO20022 Message Generator
-                </h1>
-                <p class="lead">Upload an XSD file and provide a JSON payload to generate ISO20022 messages</p>
-            </div>
-        </div>
 
-        <div class="row">
+
+    <div class="container py-4">
+        <header class="d-flex align-items-center pb-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center text-decoration-none">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" height="40" class="me-3">
+                <span class="fs-4">ISO20022 Toolkit</span>
+            </a>
+        </header>
+
+        <!-- Main Tabs -->
+        <ul class="nav nav-tabs mb-3" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="generator-tab" data-bs-toggle="tab" data-bs-target="#generator-pane" type="button" role="tab" aria-controls="generator-pane" aria-selected="true">Generator</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="parser-tab" data-bs-toggle="tab" data-bs-target="#parser-pane" type="button" role="tab" aria-controls="parser-pane" aria-selected="false">Parser</button>
+            </li>
+        </ul>
+
+        <!-- Tab Panes -->
+        <div class="tab-content" id="mainTabContent">
+            <!-- Generator Pane -->
+            <div class="tab-pane fade show active" id="generator-pane" role="tabpanel" aria-labelledby="generator-tab">
+                <div class="row">
             <div class="col-md-5">
                 <div class="card">
                     <div class="card-header">
@@ -91,6 +54,21 @@
                                 <div class="form-text">Select the ISO20022 message type to generate</div>
                             </div>
                             
+                            <div class="mb-3">
+                                <label for="environment" class="form-label">Environment</label>
+                                <select class="form-select" id="environment" name="environment" required>
+                                    <option value="TEST" selected>TEST</option>
+                                    <option value="PROD">PROD</option>
+                                </select>
+                                <div class="form-text">Select the target environment</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="fed-aba" class="form-label">Fed ABA Number</label>
+                                <input type="text" class="form-control" id="fed-aba" name="fed_aba" required>
+                                <div class="form-text">Enter the Fed ABA number</div>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="xsd-file" class="form-label">XSD File</label>
                                 <input type="file" class="form-control" id="xsd-file" name="xsd_file" accept=".xsd" required>
@@ -249,129 +227,195 @@
                 </div>
             </div>
         </div>
+    </div> <!-- End Generator Pane -->
+
+    <!-- Parser Pane -->
+            <div class="tab-pane fade" id="parser-pane" role="tabpanel" aria-labelledby="parser-tab">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-search"></i> Parse XML Message</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="parser-form" enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label for="parser_message_code" class="form-label">Message Code</label>
+                                        <select class="form-select" id="parser_message_code" name="message_code" required>
+                                            <option selected disabled value="">Choose...</option>
+                                        </select>
+                                        <div class="form-text">The message code (e.g., pacs.008.001.08, pacs.028.001.03) is required to select the correct parsing model.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="xmlFile" class="form-label">Upload ISO 20022 XML File</label>
+                                        <input class="form-control" type="file" id="xmlFile" name="xmlFile" accept=".xml,text/xml" required>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-play-circle"></i> Parse File
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Parsed Content</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="loading" id="parser-loading">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Parsing file...</p>
+                                </div>
+                                <div id="parser-result-container" style="display: none;">
+                                    <pre><code class="language-json" id="parsedResult"></code></pre>
+                                </div>
+                                <div id="parser-error-container" class="alert alert-danger" style="display: none;">
+                                    <i class="bi bi-exclamation-triangle"></i> <span id="parser-error-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End Parser Pane -->
+
+        </div> <!-- End Tab Content -->
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('message-form');
-            const payloadTabs = document.getElementById('payloadTabs');
-            const textPayload = document.getElementById('payload-text');
-            const filePayload = document.getElementById('payload-file');
-            const resultContainer = document.getElementById('result-container');
-            const errorContainer = document.getElementById('error-container');
-            const errorMessage = document.getElementById('error-message');
-            const messageOutput = document.getElementById('message-output');
-            const appHdrOutput = document.getElementById('app-hdr-output');
-            const documentOutput = document.getElementById('document-output');
-            const downloadBtn = document.getElementById('download-btn');
-            const copyBtn = document.getElementById('copy-btn');
-            const loading = document.getElementById('loading');
-
-            // Handle tab switching for payload input
-            payloadTabs.addEventListener('shown.bs.tab', function(event) {
-                if (event.target.id === 'text-tab') {
-                    textPayload.setAttribute('data-required', 'true');
-                    filePayload.setAttribute('data-required', 'false');
-                } else {
-                    textPayload.setAttribute('data-required', 'false');
-                    filePayload.setAttribute('data-required', 'true');
-                }
-            });
-
-            // Handle form submission
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                // Validate form
-                const messageCode = document.getElementById('message-code').value;
-                const xsdFile = document.getElementById('xsd-file').files[0];
-                
-                if (!messageCode || !xsdFile) {
-                    showError('Please fill in all required fields');
-                    return;
-                }
-                
-                // Check if payload is provided based on active tab
-                const textTabActive = document.getElementById('text-tab').classList.contains('active');
-                if (textTabActive && !textPayload.value.trim()) {
-                    showError('Please provide a JSON payload');
-                    return;
-                }
-                
-                if (!textTabActive && !filePayload.files[0]) {
-                    showError('Please upload a JSON payload file');
-                    return;
-                }
-                
-                // Hide previous results and errors
-                resultContainer.style.display = 'none';
-                errorContainer.style.display = 'none';
-                loading.style.display = 'block';
-                
-                // Create form data
-                const formData = new FormData(form);
-                
-                // Send request
-                fetch('/generate', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    loading.style.display = 'none';
-                    
-                    if (data.error) {
-                        showError(data.error);
-                        return;
-                    }
-                    
-                    // Show results
-                    resultContainer.style.display = 'block';
-                    messageOutput.textContent = data.complete_message;
-                    appHdrOutput.textContent = data.app_hdr;
-                    documentOutput.textContent = data.document;
-                    
-                    // Set download link
-                    downloadBtn.href = `/download/${data.filename}`;
-                    downloadBtn.download = data.filename;
-                })
-                .catch(error => {
-                    loading.style.display = 'none';
-                    showError('An error occurred: ' + error.message);
+        document.addEventListener('DOMContentLoaded', function () {
+            // Populate message codes for the parser dropdown
+            const parserMessageCodeSelect = document.getElementById('parser_message_code');
+            if (parserMessageCodeSelect) {
+                const messageCodes = [
+                    'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08',
+                    'urn:iso:std:iso:20022:tech:xsd:pacs.002.001.10'
+                ];
+                messageCodes.forEach(code => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = code;
+                    parserMessageCodeSelect.appendChild(option);
                 });
-            });
-            
-            // Copy to clipboard
-            copyBtn.addEventListener('click', function() {
-                const activeTab = document.querySelector('#resultTabs .nav-link.active');
-                let textToCopy = '';
-                
-                if (activeTab.id === 'complete-tab') {
-                    textToCopy = messageOutput.textContent;
-                } else if (activeTab.id === 'app-hdr-tab') {
-                    textToCopy = appHdrOutput.textContent;
-                } else if (activeTab.id === 'document-tab') {
-                    textToCopy = documentOutput.textContent;
+            }
+
+            // --- COMMON HELPER FUNCTIONS ---
+            const loadingSpinner = (id, show) => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = show ? 'block' : 'none';
+            };
+
+            function showError(message, containerId, messageId) {
+                const container = document.getElementById(containerId);
+                const msgEl = document.getElementById(messageId);
+                if (container && msgEl) {
+                    if (message) {
+                        msgEl.textContent = message;
+                        container.style.display = 'block';
+                    } else {
+                        container.style.display = 'none';
+                    }
                 }
-                
-                navigator.clipboard.writeText(textToCopy)
-                    .then(() => {
-                        const originalText = copyBtn.innerHTML;
-                        copyBtn.innerHTML = '<i class="bi bi-check"></i> Copied!';
-                        setTimeout(() => {
-                            copyBtn.innerHTML = originalText;
-                        }, 2000);
+            }
+
+            // --- GENERATOR FUNCTIONALITY ---
+            const generatorForm = document.getElementById('message-form');
+            if (generatorForm) {
+                const resultContainer = document.getElementById('result-container');
+                const messageOutput = document.getElementById('message-output');
+                const appHdrOutput = document.getElementById('app-hdr-output');
+                const documentOutput = document.getElementById('document-output');
+                const downloadBtn = document.getElementById('download-btn');
+                const copyBtn = document.getElementById('copy-btn');
+
+                generatorForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    loadingSpinner('loading', true);
+                    resultContainer.style.display = 'none';
+                    showError(null, 'error-container', 'error-message');
+
+                    const formData = new FormData(generatorForm);
+                    const textPayload = document.getElementById('payload-text').value;
+                    if (textPayload) {
+                        formData.append('payload', textPayload);
+                    }
+
+                    fetch('/generate', {
+                        method: 'POST',
+                        body: formData
                     })
-                    .catch(err => {
-                        showError('Failed to copy: ' + err);
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingSpinner('loading', false);
+                        if (data.error) {
+                            showError(data.error, 'error-container', 'error-message');
+                        } else {
+                            messageOutput.textContent = data.complete_message;
+                            appHdrOutput.textContent = data.app_hdr;
+                            documentOutput.textContent = data.document;
+                            resultContainer.style.display = 'block';
+                            downloadBtn.href = `data:text/xml;charset=utf-8,${encodeURIComponent(data.complete_message)}`;
+                            downloadBtn.download = data.filename;
+                        }
+                    })
+                    .catch(error => {
+                        loadingSpinner('loading', false);
+                        showError('An unexpected error occurred: ' + error, 'error-container', 'error-message');
                     });
-            });
-            
-            // Helper function to show errors
-            function showError(message) {
-                errorContainer.style.display = 'block';
-                errorMessage.textContent = message;
+                });
+
+                if (copyBtn) {
+                    copyBtn.addEventListener('click', () => {
+                        const activeTab = document.querySelector('#resultTabContent .tab-pane.active pre');
+                        if(activeTab) {
+                            navigator.clipboard.writeText(activeTab.textContent).then(() => {
+                                const originalText = copyBtn.innerHTML;
+                                copyBtn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+                                setTimeout(() => copyBtn.innerHTML = originalText, 2000);
+                            });
+                        }
+                    });
+                }
+            }
+
+            // --- PARSER FUNCTIONALITY ---
+            const parserForm = document.getElementById('parser-form');
+            if (parserForm) {
+                const parserResultContainer = document.getElementById('parser-result-container');
+                const parserResultEl = document.getElementById('parsedResult');
+
+                parserForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    loadingSpinner('parser-loading', true);
+                    parserResultContainer.style.display = 'none';
+                    showError(null, 'parser-error-container', 'parser-error-message');
+
+                    const formData = new FormData(parserForm);
+
+                    fetch('/parse', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingSpinner('parser-loading', false);
+                        if (data.error) {
+                            showError(data.error, 'parser-error-container', 'parser-error-message');
+                        } else {
+                            parserResultEl.textContent = JSON.stringify(data, null, 4);
+                            parserResultContainer.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        loadingSpinner('parser-loading', false);
+                        showError('An unexpected error occurred: ' + error, 'parser-error-container', 'parser-error-message');
+                    });
+                });
             }
         });
     </script>
