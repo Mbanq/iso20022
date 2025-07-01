@@ -48,7 +48,7 @@ def handle_generate(args):
         sys.exit(1)
 
     payload = load_input_payload(input_path)
-    _, _, complete_message = generate_fedwire_message(args.message_code, args.fed_aba, payload, xsd_path)
+    _, _, complete_message = generate_fedwire_message(args.message_code, args.environment, args.fed_aba, payload, xsd_path)
 
     if complete_message:
         output_file = args.output_file or generate_output_filename(args.message_code, 'xml')
@@ -86,6 +86,7 @@ def main():
     # Generate command
     gen_parser = subparsers.add_parser('generate', help='Generate a complete ISO 20022 message.')
     gen_parser.add_argument('--message_code', help='ISO 20022 message code (e.g., urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08)')
+    gen_parser.add_argument('--environment', required=True, choices=['TEST', 'PROD'], help='The environment for the message (TEST or PROD).')
     gen_parser.add_argument('--fed-aba', required=True, help='The Fed ABA number for message generation.')
     gen_parser.add_argument('--input-file', required=True, help='Path to input JSON payload file.')
     gen_parser.add_argument('--output-file', help='Path to output XML file.')

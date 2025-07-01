@@ -37,14 +37,16 @@ with open('sample_files/sample_payload.json', 'r') as f:
 
 # 2. Define the necessary message parameters
 message_code = 'urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08'
+environment = "TEST"  # Or "PROD"
 fed_aba = '000000008' # The ABA number for the Fed
 xsd_path = 'proprietary_fed_file.xsd' # The XSD file for fedwire format
 
 # 3. Generate the complete XML message
 _, _, complete_message = generate_fedwire_message(
     message_code=message_code,
-    payload=payload,
+    environment=environment,
     fed_aba=fed_aba,
+    payload=payload,
     xsd_path=xsd_path
 )
 
@@ -70,14 +72,16 @@ with open('sample_files/sample_pacs028_payload.json', 'r') as f:
 
 # 2. Define message parameters
 message_code = 'urn:iso:std:iso:20022:tech:xsd:pacs.028.001.03'
+environment = "TEST"  # Or "PROD"
 fed_aba = '000000008'
 xsd_path = 'proprietary_fed_file.xsd'
 
 # 3. Generate the XML message
 _, _, complete_message = generate_fedwire_message(
     message_code=message_code,
-    payload=payload,
+    environment=environment,
     fed_aba=fed_aba,
+    payload=payload,
     xsd_path=xsd_path
 )
 
@@ -144,12 +148,13 @@ The package includes a command-line tool, `miso20022`, for generating and parsin
 **Usage:**
 
 ```bash
-miso20022 generate --message_code [MESSAGE_CODE] --fed-aba [ABA_NUMBER] --input-file [PAYLOAD_FILE] --output-file [OUTPUT_XML]
+miso20022 generate --message_code [MESSAGE_CODE] --environment [ENV] --fed-aba [ABA_NUMBER] --input-file [PAYLOAD_FILE] --output-file [OUTPUT_XML]
 ```
 
 **Arguments:**
 
 -   `--message_code`: The ISO 20022 message code (e.g., `urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08`).
+-   `--environment`: The environment for the message (`TEST` or `PROD`).
 -   `--fed-aba`: The Fedwire ABA number.
 -   `--input-file`: Path to the input JSON payload file.
 -   `--output-file`: (Optional) Path to save the generated XML message.
@@ -160,7 +165,8 @@ miso20022 generate --message_code [MESSAGE_CODE] --fed-aba [ABA_NUMBER] --input-
 ```bash
 miso20022 generate \
     --message_code urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 \
-    --fed-aba 021151080 \
+    --environment TEST \
+    --fed-aba 000000008 \
     --input-file sample_files/sample_payment.json \
     --output-file pacs.008_output.xml
 ```
@@ -218,6 +224,8 @@ We are actively working to expand the range of supported message types. Future r
 
 ## Contributing
 
-Contributions are welcome! Please refer to the [main project repository](https://github.com/Mbanq/iso20022) for contribution guidelines, to open an issue, or to submit a pull request.
+Contributions are welcome! Please refer to the [Project repository](https://github.com/Mbanq/iso20022) for contribution guidelines, to open an issue, or to submit a pull request.
+
+<p align="center"><strong style="font-size: 2em">Built with ❤️ in the Beautiful State of Washington!</strong></p>
 
 

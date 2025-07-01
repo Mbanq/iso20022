@@ -6,23 +6,23 @@ build-backend = "setuptools.build_meta"
 name = "miso20022"
 version = "0.1.0"
 description = "ISO 20022 Message Generator for US Payment Rails"
-readme = "README.md"
+readme = "PKG_README.md"
 authors = [
+    {name = "Mbanq", email = "developers@mbanq.com"},
     {name = "Sai Vatsavai", email = "sai.vatsavai@mbanq.com"},
     {name = "Vamsi Krishna", email = "vamsi.krishna@mbanq.com"}
 ]
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 requires-python = ">=3.7"
 classifiers = [
-    "Development Status :: Beta",
-    "Intended Audience :: Financial Industry",
-    "License :: Apache License 2.0",
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Topic :: Financial",
+    "Topic :: Office/Business :: Financial",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 keywords = ["iso20022", "financial", "messaging", "banking", "fedwire", "us payment rails", "fednow"]

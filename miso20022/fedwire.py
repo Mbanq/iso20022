@@ -159,24 +159,26 @@ def generate_message_structure(app_hdr_xml, document_xml, name, target_ns, root_
     
     return complete_structure
 
-def generate_fedwire_message(message_code: str, fed_aba: str, payload: Dict[str, Any], xsd_path: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+def generate_fedwire_message(message_code: str, environment: str, fed_aba: str, payload: Dict[str, Any], xsd_path: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     """
     Generate a complete ISO20022 message using the models from miso20022.
     
     Args:
-        message_code: The ISO20022 message code (e.g., urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08)
-        payload: The payload data as a dictionary
-        xsd_path: Path to the XSD file for structure identification
+        message_code: The ISO20022 message code (e.g., urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08).
+        environment: The environment for the message, either "TEST" or "PROD".
+        fed_aba: The Fed ABA number for message generation.
+        payload: The payload data as a dictionary.
+        xsd_path: Path to the XSD file for structure identification.
         
     Returns:
-        Tuple of (AppHdr XML, Document XML, Complete Structure XML) or (None, None, None) if not supported
+        Tuple of (AppHdr XML, Document XML, Complete Structure XML) or (None, None, None) if not supported.
     """
     # Extract the message type from the message code
     message_type = message_code.split(':')[-1]
     
     try:
         # Generate AppHdr
-        app_hdr = AppHdr.from_payload(fed_aba, payload)
+        app_hdr = AppHdr.from_payload(environment, fed_aba, message_code, payload)
         app_hdr_dict = app_hdr.to_dict()
         app_hdr_xml = dict_to_xml(app_hdr_dict, "head", "urn:iso:std:iso:20022:tech:xsd:head.001.001.03")
         

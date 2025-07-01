@@ -58,9 +58,22 @@ class AppHdr:
     @classmethod
     def from_payload(
             cls,
+            environment,
             fed_aba,
+            message_code,
             payload: Dict[str, Any]
     ) -> "AppHdr":
+        """Create an AppHdr instance from a payload dictionary.
+
+        Args:
+            environment: The environment for the message, either "TEST" or "PROD".
+            fed_aba: The Fed ABA number for the receiving institution.
+            message_code: The ISO20022 message code (e.g., urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08).
+            payload: The payload data as a dictionary.
+
+        Returns:
+            An AppHdr instance.
+        """
         fedwire_message = payload["fedWireMessage"]
         msg_data = fedwire_message["inputMessageAccountabilityData"]
         message_id = (
@@ -71,6 +84,9 @@ class AppHdr:
 
         sender_aba = fedwire_message["senderDepositoryInstitution"]["senderABANumber"]
         receiver_aba = fed_aba
+
+        # Extract only the message type from the full message code
+        msg_def_idr = message_code.split(':')[-1]
 
         return cls(
             Fr=Fr(
@@ -88,8 +104,8 @@ class AppHdr:
                 )
             ),
             BizMsgIdr=message_id,
-            MsgDefIdr="pacs.008.001.08",
-            BizSvc="TEST",
+            MsgDefIdr=msg_def_idr,
+            BizSvc=environment,
             MktPrctc=MktPrctc(
                 Regy="www2.swift.com/mystandards/#/group/Federal_Reserve_Financial_Services/Fedwire_Funds_Service",
                 Id="frb.fedwire.01"

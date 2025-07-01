@@ -1,6 +1,6 @@
 # ISO20022 Message Generator and Parser
 
-This project provides a comprehensive suite of tools for working with ISO 20022 messages, with a special focus on the Fedwire Funds Service. It includes a message generator, a payload parser, and a web application to streamline the process of creating and handling ISO 20022 messages.
+This project provides a comprehensive suite of tools for working with ISO 20022 messages, with a special focus on the US Payment Rails. It includes a message generator, a payload parser, and a web application to streamline the process of creating and handling ISO 20022 messages.
 
 ## Key Features
 
@@ -13,10 +13,26 @@ This project provides a comprehensive suite of tools for working with ISO 20022 
 
 ## Installation
 
+There are two ways to install the project, depending on your needs.
+
+### Standard Installation (Recommended)
+
+If you want to use the `miso20022` library or CLI tools in your own projects, you can install it directly from PyPI:
+
+```bash
+pip install miso20022
+```
+
+This will download and install the latest stable release.
+
+### Developer Installation
+
+If you want to contribute to the project or need the very latest (unreleased) changes, you should clone the repository and install it in editable mode.
+
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/iso20022.git
+    git clone https://github.com/Mbanq/iso20022.git
     cd iso20022
     ```
 
@@ -27,6 +43,8 @@ This project provides a comprehensive suite of tools for working with ISO 20022 
     ```
 
 3.  **Install the package in editable mode:**
+
+    This allows you to make changes to the source code and have them immediately reflected in your environment.
 
     ```bash
     pip install -e .
@@ -47,12 +65,13 @@ This command generates a complete ISO 20022 message from a JSON payload.
 **Usage:**
 
 ```bash
-miso20022 generate --message_code [MESSAGE_CODE] --fed-aba [ABA_NUMBER] --input-file [PAYLOAD_FILE] --output-file [OUTPUT_XML]
+miso20022 generate --message_code [MESSAGE_CODE] --environment [ENV] --fed-aba [ABA_NUMBER] --input-file [PAYLOAD_FILE] --output-file [OUTPUT_XML]
 ```
 
 **Arguments:**
 
 -   `--message_code`: The ISO 20022 message code (e.g., `urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08`).
+-   `--environment`: The environment for the message (`TEST` or `PROD`).
 -   `--fed-aba`: The Fedwire ABA number.
 -   `--input-file`: Path to the input JSON payload file.
 -   `--output-file`: (Optional) Path to save the generated XML message. If not provided, a filename will be generated automatically.
@@ -63,7 +82,8 @@ miso20022 generate --message_code [MESSAGE_CODE] --fed-aba [ABA_NUMBER] --input-
 ```bash
 miso20022 generate \
     --message_code urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08 \
-    --fed-aba 021151080 \
+    --environment TEST \
+    --fed-aba 00088444 \
     --input-file sample_files/sample_payment.json \
     --output-file pacs.008_output.xml
 ```
