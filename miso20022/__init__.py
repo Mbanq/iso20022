@@ -7,7 +7,13 @@ ISO 20022 data models package.
 from dataclasses import asdict
 from miso20022.bah.apphdr import AppHdr
 from miso20022.pacs import Document, FIToFICstmrCdtTrf
-from miso20022.helpers import dict_to_xml
+from miso20022.helpers import dict_to_xml, parse_xml_to_json
+from miso20022.fedwire import (
+    generate_fedwire_message,
+    generate_fedwire_payload,
+    parse_message_envelope,
+    generate_message_structure,
+)
 
 def model_to_xml(model, prefix=None, namespace=None):
     """Convert model to XML using the dictionary-based approach."""
@@ -31,4 +37,9 @@ __all__ = [
     "FIToFICstmrCdtTrf",
     "dict_to_xml",
     "model_to_xml",
+    "generate_fedwire_message",
+    "generate_fedwire_payload",
+    "parse_message_envelope",
+    "generate_message_structure",
+    "parse_xml_to_json",
 ]

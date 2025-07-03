@@ -70,6 +70,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+test-module/
 
 # Spyder project settings
 .spyderproject
