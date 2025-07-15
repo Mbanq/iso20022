@@ -43,6 +43,7 @@ class AppHdr:
     BizMsgIdr: str
     MsgDefIdr: str
     BizSvc: str
+    BizPrcgDt: str
     MktPrctc: MktPrctc
     CreDt: str
 
@@ -126,9 +127,10 @@ class AppHdr:
         app_hdr = AppHdr(
             Fr=Fr(FIId=FIId(FinInstnId=FinInstnId(ClrSysMmbId=ClrSysMmbId(**app_hdr_data['Fr']['FIId']['FinInstnId']['ClrSysMmbId'])))),
             To=To(FIId=FIId(FinInstnId=FinInstnId(ClrSysMmbId=ClrSysMmbId(**app_hdr_data['To']['FIId']['FinInstnId']['ClrSysMmbId'])))),
-            BizMsgIdr=app_hdr_data['BizMsgIdr'],
+            BizMsgIdr=app_hdr_data.get('BizMsgIdr', ''),
             MsgDefIdr=app_hdr_data['MsgDefIdr'],
             BizSvc=app_hdr_data['BizSvc'],
+            BizPrcgDt=app_hdr_data.get('BizPrcgDt', ''),
             MktPrctc=MktPrctc(**app_hdr_data['MktPrctc']),
             CreDt=app_hdr_data['CreDt']
         )

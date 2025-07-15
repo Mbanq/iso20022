@@ -297,8 +297,16 @@ def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf, grp_hdr_data):
         "fedWireMessage": {
             "inputMessageAccountabilityData": {
                 "inputCycleDate": grp_hdr_data.MsgId[:8],
-                "inputSource": grp_hdr_data.MsgId[8:13],
-                "inputSequenceNumber": grp_hdr_data.MsgId[13:]
+                "inputSource": grp_hdr_data.MsgId[8:16],
+                "inputSequenceNumber": grp_hdr_data.MsgId[16:22]
+            },
+            "outputMessageAccountabilityData":{
+                "outputCycleDate": app_hdr.BizMsgIdr[:8],
+                "outputDestinationID":app_hdr.BizMsgIdr[8:16],
+                "outputSequenceNumber": app_hdr.BizMsgIdr[16:22],
+                "outputDate": app_hdr.BizMsgIdr[22:26],
+                "outputTime": app_hdr.BizMsgIdr[26:30],
+                "outputFRBApplicationIdentification": app_hdr.BizMsgIdr[30:34]
             },
             "amount": {
                 "amount": str(int(float(cdt_trf_tx_inf.IntrBkSttlmAmt['#text'])))

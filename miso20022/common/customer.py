@@ -27,12 +27,11 @@ class PstlAdr:
     Dept: Optional[str] = None  # Added to handle Department field
     SubDept: Optional[str] = None  # Added to handle SubDepartment field
 
-
 @dataclass
 class ClrSysId:
     """Clearing system identification."""
     Cd: str = "USABA"
-
+    Agt: Optional[Agt] = None
 
 @dataclass
 class ClrSysMmbId:
