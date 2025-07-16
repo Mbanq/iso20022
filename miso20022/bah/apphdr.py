@@ -107,6 +107,7 @@ class AppHdr:
             BizMsgIdr=message_id,
             MsgDefIdr=msg_def_idr,
             BizSvc=environment,
+            BizPrcgDt=None,
             MktPrctc=MktPrctc(
                 Regy="www2.swift.com/mystandards/#/group/Federal_Reserve_Financial_Services/Fedwire_Funds_Service",
                 Id="frb.fedwire.01"
@@ -130,7 +131,7 @@ class AppHdr:
             BizMsgIdr=app_hdr_data.get('BizMsgIdr', ''),
             MsgDefIdr=app_hdr_data['MsgDefIdr'],
             BizSvc=app_hdr_data['BizSvc'],
-            BizPrcgDt=app_hdr_data.get('BizPrcgDt', ''),
+            BizPrcgDt=app_hdr_data['BizPrcgDt'],
             MktPrctc=MktPrctc(**app_hdr_data['MktPrctc']),
             CreDt=app_hdr_data['CreDt']
         )
