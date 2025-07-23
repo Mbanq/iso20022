@@ -8,6 +8,9 @@
     "amount": {
       "amount": "1000"
     },
+    "businessFunctionCode": {
+            "businessFunctionCode": "CTP"
+        },
     "senderDepositoryInstitution": {
       "senderABANumber": "121182904",
       "senderShortName": "NORTH BAY CREDIT U",

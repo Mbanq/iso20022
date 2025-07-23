@@ -311,13 +311,26 @@ def pacs_008_to_fedwire_json    (app_hdr, cdt_trf_tx_inf, grp_hdr_data):
             "amount": {
                 "amount": str(int(float(cdt_trf_tx_inf.IntrBkSttlmAmt['#text'])))
             },
+            "businessFunctionCode": {
+                "businessFunctionCode": cdt_trf_tx_inf.PmtTpInf.LclInstrm.Prtry
+            },
             "senderDepositoryInstitution": {
                 "senderABANumber": cdt_trf_tx_inf.InstgAgt.FinInstnId.ClrSysMmbId.MmbId,
-                "senderShortName": cdt_trf_tx_inf.DbtrAgt.FinInstnId.Nm or ""
+                "senderShortName": cdt_trf_tx_inf.DbtrAgt.FinInstnId.Nm or "",
+                "senderAddress": {
+                    "addressLineOne": get_adr_line(cdt_trf_tx_inf.DbtrAgt.FinInstnId.PstlAdr, 0),
+                    "addressLineTwo": get_adr_line(cdt_trf_tx_inf.DbtrAgt.FinInstnId.PstlAdr, 1),
+                    "addressLineThree": get_adr_line(cdt_trf_tx_inf.DbtrAgt.FinInstnId.PstlAdr, 2)
+                }
             },
             "receiverDepositoryInstitution": {
                 "receiverABANumber": cdt_trf_tx_inf.InstdAgt.FinInstnId.ClrSysMmbId.MmbId,
-                "receiverShortName": cdt_trf_tx_inf.CdtrAgt.FinInstnId.Nm or ""
+                "receiverShortName": cdt_trf_tx_inf.CdtrAgt.FinInstnId.Nm or "",
+                "receiverAddress": {
+                    "addressLineOne": get_adr_line(cdt_trf_tx_inf.CdtrAgt.FinInstnId.PstlAdr, 0),
+                    "addressLineTwo": get_adr_line(cdt_trf_tx_inf.CdtrAgt.FinInstnId.PstlAdr, 1),
+                    "addressLineThree": get_adr_line(cdt_trf_tx_inf.CdtrAgt.FinInstnId.PstlAdr, 2)
+                }
             },
             "originator": {
                 "personal": {
