@@ -135,9 +135,10 @@ class Document:
 
         # Helper for address lines
         def adr_lines(personal: Dict[str, Any]) -> List[str]:
+            address_data = personal.get("address", personal)
             lines = []
             for key in ("addressLineOne", "addressLineTwo", "addressLineThree"):
-                val = personal["address"].get(key, "").replace("NA", "").strip()
+                val = address_data.get(key, "").replace("NA", "").strip()
                 if val:
                     if len(val) > 32:
                         raise ValueError(f"Address line '{key}' ('{val}') exceeds 32 characters.")
@@ -184,14 +185,14 @@ class Document:
                 FinInstnId=FinInstnId(
                     ClrSysMmbId=ClrSysMmbId(ClrSysId(), msg["senderDepositoryInstitution"]["senderABANumber"]),
                     Nm=msg["senderDepositoryInstitution"]["senderShortName"],
-                    PstlAdr=PstlAdr(AdrLine=adr_lines(msg["originator"]["personal"]))
+                    PstlAdr=PstlAdr(AdrLine=adr_lines(msg["senderDepositoryInstitution"]["senderAddress"]))
                 )
             ),
             CdtrAgt=CdtrAgt(
                 FinInstnId=FinInstnId(
                     ClrSysMmbId=ClrSysMmbId(ClrSysId(), msg["receiverDepositoryInstitution"]["receiverABANumber"]),
                     Nm=msg["receiverDepositoryInstitution"]["receiverShortName"],
-                    PstlAdr=PstlAdr(AdrLine=adr_lines(msg["beneficiary"]["personal"]))
+                    PstlAdr=PstlAdr(AdrLine=adr_lines(msg["receiverDepositoryInstitution"]["receiverAddress"]))
                 )
             ),
             Cdtr=Cdtr(

@@ -10,11 +10,21 @@
     },
     "senderDepositoryInstitution": {
       "senderABANumber": "121182904",
-      "senderShortName": "NORTH BAY CREDIT U"
+      "senderShortName": "NORTH BAY CREDIT U",
+      "senderAddress": {
+        "addressLineOne": "123 MAIN STREET",
+        "addressLineTwo": "Live Town, CA 12345",
+        "addressLineThree": ""
+      }
     },
     "receiverDepositoryInstitution": {
       "receiverABANumber": "084106768",
-      "receiverShortName": "EVOLVE BANK & TRUST"
+      "receiverShortName": "EVOLVE BANK & TRUST",
+      "receiverAddress": {
+        "addressLineOne": "123",
+        "addressLineTwo": "Eat Town, CA 12345",
+        "addressLineThree": ""
+      }
     },
     "originator": {
       "personal": {

@@ -47,6 +47,7 @@ The routing number of the receiving institution.
 | :--- | :--- | :--- |
 | `senderABANumber` | String | The ABA routing number of the sender's institution. |
 | `senderShortName` | String | The short name of the sender's institution. |
+| `senderAddress` | Object | The postal address of the sender's institution. |
 
 ### `receiverDepositoryInstitution`
 
@@ -54,6 +55,7 @@ The routing number of the receiving institution.
 | :--- | :--- | :--- |
 | `receiverABANumber` | String | The ABA routing number of the receiver's institution. |
 | `receiverShortName` | String | The short name of the receiver's institution. |
+| `receiverAddress` | Object | The postal address of the receiver's institution. |
 
 ### `originator` / `beneficiary`
 
@@ -71,7 +73,7 @@ These objects share the same structure.
 | `address` | Object | The postal address of the individual. |
 | `identifier` | String | A unique identifier for the individual. |
 
-##### `address` Object
+##### `address` / `senderAddress` / `receiverAddress` Object
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
