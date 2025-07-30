@@ -1,0 +1,21 @@
+{
+  "fedWireMessage": {
+    "inputMessageAccountabilityData": {
+      "inputCycleDate": "20231106",
+      "inputSource": "MANUAL",
+      "inputSequenceNumber": "000001"
+    },
+    "senderDepositoryInstitution": {
+      "senderABANumber": "111111111"
+    }
+  },
+  "Document": {
+    "SysEvtNtfctn": {
+      "EvtInf": {
+        "EvtCd": "PING",
+        "EvtParam": "A0001391",
+        "EvtTm": "2023-11-06T10:00:00Z"
+      }
+    }
+  }
+}

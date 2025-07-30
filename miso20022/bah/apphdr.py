@@ -62,7 +62,8 @@ class AppHdr:
             environment,
             fed_aba,
             message_code,
-            payload: Dict[str, Any]
+            payload: Dict[str, Any],
+            payment_system: str = 'fedwire'
     ) -> "AppHdr":
         """Create an AppHdr instance from a payload dictionary.
 
@@ -71,6 +72,7 @@ class AppHdr:
             fed_aba: The Fed ABA number for the receiving institution.
             message_code: The ISO20022 message code (e.g., urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08).
             payload: The payload data as a dictionary.
+            payment_system: The payment system, either 'fedwire' or 'fednow'.
 
         Returns:
             An AppHdr instance.
@@ -88,6 +90,17 @@ class AppHdr:
 
         # Extract only the message type from the full message code
         msg_def_idr = message_code.split(':')[-1]
+
+        if payment_system == 'fednow':
+            mkt_prctc = MktPrctc(
+                Regy="www2.swift.com/mystandards/#/group/Federal_Reserve_Financial_Services/FedNow_Service",
+                Id="frb.fednow.01"
+            )
+        else:  # Default to fedwire
+            mkt_prctc = MktPrctc(
+                Regy="www2.swift.com/mystandards/#/group/Federal_Reserve_Financial_Services/Fedwire_Funds_Service",
+                Id="frb.fedwire.01"
+            )
 
         return cls(
             Fr=Fr(
@@ -108,15 +121,12 @@ class AppHdr:
             MsgDefIdr=msg_def_idr,
             BizSvc=environment,
             BizPrcgDt=None,
-            MktPrctc=MktPrctc(
-                Regy="www2.swift.com/mystandards/#/group/Federal_Reserve_Financial_Services/Fedwire_Funds_Service",
-                Id="frb.fedwire.01"
-            ),
+            MktPrctc=mkt_prctc,
             CreDt=datetime.now(timezone.utc).isoformat(),
         )
 
     @classmethod
-    def from_iso20022(cls, data: Dict[str, Any],message_code)-> "AppHdr":
+    def from_iso20022(cls, data: Dict[str, Any], message_code) -> "AppHdr":
 
         # 1. Extract AppHdr data
         if message_code == "urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08":
